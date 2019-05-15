@@ -111,13 +111,23 @@ class ApiController extends \yii\rest\Controller
             $nasabah = Nasabah::find()->where(['email'=>$param['email']])->one();
             if ($nasabah) {
             	$akun = Akun::find()->where(['id'=>$nasabah->id_akun])->one();
-            	if ($nasabah->validatePassword($param['password'], $akun->password_hash)) {
-                    $response['message'] = 'Berhasil login';
-        			$response['status'] = 1;
-                }else{
-                    $response['message'] = 'Password tidak sesuai';
-        			$response['status'] = 0;
-                }
+            	if ($akun->id_status_akun == 1) {
+	            	if ($nasabah->validatePassword($param['password'], $akun->password_hash)) {
+	            		$response['id'] = $nasabah->id;
+	        			$response['nama'] = $nasabah->nama;
+	        			$response['email'] = $nasabah->email;
+	        			$response['nomor_telepon'] = $nasabah->nomor_telepon;
+	        			$response['access_token'] = $akun->access_token;
+	                    $response['message'] = 'Berhasil login';
+	        			$response['status'] = 1;
+	                }else{
+	                    $response['message'] = 'Password tidak sesuai';
+	        			$response['status'] = 0;
+	                }
+	            } else {
+	            	$response['message'] = 'Akun tidak aktif';
+	        		$response['status'] = 0;
+	            }
             }else{
                 $response['message'] = 'Email tidak ditemukan';
             	$response['status'] = 0;
