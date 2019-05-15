@@ -18,7 +18,7 @@ class NasabahSearch extends Nasabah
     {
         return [
             [['id', 'id_akun'], 'integer'],
-            [['nama', 'alamat', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'nomor_telepon', 'email', 'foto_ktp', 'foto_bersama_ktp', 'access_token'], 'safe'],
+            [['nama', 'alamat', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'nomor_telepon', 'email'], 'safe'],
             [['latitude', 'longitude'], 'number'],
         ];
     }
@@ -71,10 +71,7 @@ class NasabahSearch extends Nasabah
             ->andFilterWhere(['like', 'tempat_lahir', $this->tempat_lahir])
             ->andFilterWhere(['like', 'jenis_kelamin', $this->jenis_kelamin])
             ->andFilterWhere(['like', 'nomor_telepon', $this->nomor_telepon])
-            ->andFilterWhere(['like', 'email', $this->email])
-            ->andFilterWhere(['like', 'foto_ktp', $this->foto_ktp])
-            ->andFilterWhere(['like', 'foto_bersama_ktp', $this->foto_bersama_ktp])
-            ->andFilterWhere(['like', 'access_token', $this->access_token]);
+            ->andFilterWhere(['like', 'email', $this->email]);
 
         return $dataProvider;
     }

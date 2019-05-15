@@ -19,7 +19,7 @@
                 'items' => [
                     ['label' => 'Menu Pinjaman Online', 'options' => ['class' => 'header']],
                     ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
-                    ['label' => 'Master Nasabah', 'icon' => 'users', 'url' => ['/nasabah']],
+                    ['label' => 'Master Nasabah', 'icon' => 'users', 'url' => ['/nasabah/index']],
                     ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
                 ],
             ]

@@ -26,6 +26,7 @@ use kartik\file\FileInput;
             <?= $form->field($model, 'tanggal_lahir')->widget(DatePicker::classname(), [
                 'options' => ['placeholder' => 'Masukkan Tanggal Lahir ...','required'=>true],
                 'pluginOptions' => [
+                    'format' => 'yyyy-mm-dd',
                     'autoclose'=>true
                 ]
             ])?>

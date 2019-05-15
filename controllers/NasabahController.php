@@ -71,36 +71,51 @@ class NasabahController extends Controller
         $password = 123456;
 
         if ($model->load(Yii::$app->request->post())) {
-            $akun->password_hash = Yii::$app->getSecurity()->generatePasswordHash($password);
-            $akun->access_token = Yii::$app->getSecurity()->generateRandomString();
-            $akun->tanggal_waktu_pembuatan = date('Y-m-d H:i:s');
-            $akun->id_status_akun = 1;
-            $akun->id_jenis_akun = 2;
-            $saveAkun = $akun->save(false);
 
-            if ($saveAkun) {
-                $model->id_akun = $akun->id;
+            $transaction = \Yii::$app->db->beginTransaction();
 
-                //upload foto ktp
-                $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
-                $images_name_ktp = rand(1,4000).'.'.$imagesKtp->extension;
-                $pathKtp = 'foto/'.$images_name_ktp;
-                if ($imagesKtp->saveAs($pathKtp)) {
-                    $model->foto_ktp = $pathKtp;
+            try {
+
+                $akun->password_hash = Yii::$app->getSecurity()->generatePasswordHash($password);
+                $akun->access_token = Yii::$app->getSecurity()->generateRandomString();
+                $akun->tanggal_waktu_pembuatan = date('Y-m-d H:i:s');
+                $akun->id_status_akun = 1;
+                $akun->id_jenis_akun = 2;
+                $saveAkun = $akun->save(false);
+
+                if ($saveAkun) {
+                    $model->id_akun = $akun->id;
+                    $model->save(false);
+
+                    //upload foto ktp
+                    $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
+                    $images_name_ktp = 'ktp-'.$model->id.'-'.time().'.'.$imagesKtp->extension;
+                    $pathKtp = 'foto/'.$images_name_ktp;
+                    if ($imagesKtp->saveAs($pathKtp)) {
+                        $model->foto_ktp = $images_name_ktp;
+                    }
+
+                    //upload foto ktp bersama
+                    $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
+                    $images_name_ktp_2 = 'bersama_ktp-'.$model->id.'-'.time().'.'.$imagesKtp->extension;
+                    $pathKtp2 = 'foto/'.$images_name_ktp_2;
+                    if ($imagesKtp2->saveAs($pathKtp2)) {
+                        $model->foto_bersama_ktp = $images_name_ktp_2;
+                    }
+
+                    $model->save(false);
+                    $transaction->commit();
+                    Yii::$app->session->setFlash('success', "Tambah Data Nasabah Berhasil");
+                    return $this->redirect('index');
                 }
 
-                //upload foto ktp bersama
-                $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
-                $images_name_ktp_2 = rand(1,4000).'.'.$imagesKtp2->extension;
-                $pathKtp2 = 'foto/'.$images_name_ktp_2;
-                if ($imagesKtp2->saveAs($pathKtp2)) {
-                    $model->foto_bersama_ktp = $pathKtp2;
-                }
+            } catch(\Exception $e) {
 
-                $model->save(false);
+                $transaction->rollback();
+                Yii::$app->session->setFlash('error', $e->getMessage());
+                return $this->redirect('index');
+
             }
-
-            return $this->redirect('index');
         }
 
         return $this->render('create', [
@@ -119,8 +134,27 @@ class NasabahController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+
+            //upload foto ktp
+            $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
+            $images_name_ktp = 'ktp-'.$model->id.'-'.time().'.'.$imagesKtp->extension;
+            $pathKtp = 'foto/'.$images_name_ktp;
+            if ($imagesKtp->saveAs($pathKtp)) {
+                $model->foto_ktp = $images_name_ktp;
+            }
+
+            //upload foto ktp bersama
+            $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
+            $images_name_ktp_2 = 'bersama_ktp-'.$model->id.'-'.time().'.'.$imagesKtp->extension;
+            $pathKtp2 = 'foto/'.$images_name_ktp_2;
+            if ($imagesKtp2->saveAs($pathKtp2)) {
+                $model->foto_bersama_ktp = $images_name_ktp_2;
+            }
+            
+            $model->save(false);
+            Yii::$app->session->setFlash('success', "Update Data Nasabah Berhasil");
+            return $this->redirect('index');
         }
 
         return $this->render('update', [
@@ -137,8 +171,12 @@ class NasabahController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = Nasabah::find()->where(['id'=>$id])->one();
+        unlink('foto/'.$model->foto_ktp);
+        unlink('foto/'.$model->foto_bersama_ktp);
+        $model->delete();
 
+        Yii::$app->session->setFlash('success', "Hapus Data Nasabah Berhasil");
         return $this->redirect(['index']);
     }
 
