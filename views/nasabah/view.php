@@ -44,8 +44,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
                             }
                         ],
-                        'latitude',
-                        'longitude',
+                        [
+                            'attribute' => 'latitude',
+                            'value' => $model->latitude != null ? $model->latitude : 'Belum Ada'
+                        ],
+                        [
+                            'attribute' => 'longitude',
+                            'value' => $model->longitude != null ? $model->longitude : 'Belum Ada'
+                        ],
                     ],
                 ]) ?>
         </div>

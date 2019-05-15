@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="nasabah-index">
 
     <p>
-        <?= Html::a('Tambah Nasabah', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Tambah Nasabah', ['create'], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <div class="box box-info">
@@ -58,8 +58,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     [
                         'class' => 'yii\grid\ActionColumn',
-                        'template' => '{view} {update} {delete}',
+                        'template' => '{telepon} {view} {update} {delete}',
                         'buttons' => [
+                            'telepon' => function($url, $model, $key){
+                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-book"></span>']),['nasabah/phone','id'=>$model->id], ['class' => 'btn btn-success modalButtonView']);
+                            },
                             'view' => function($url, $model, $key){
                                 return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-eye-open"></span>']),['nasabah/view','id'=>$model->id], ['class' => 'btn btn-danger modalButtonView']);
                             },
@@ -93,4 +96,17 @@ $this->params['breadcrumbs'][] = $this->title;
     ]);
     echo "<div id='modalContentView'></div>";
     Modal::end();
+?>
+
+<?php
+    $this->registerJs("
+
+        // $('.modalButtonView').click(function(e) {
+        //  e.preventDefault();
+        //  $('#modalView').modal('show')
+        //  .find('#modalContentView')
+        //  .load($(this).attr('href'));
+        // });
+
+    ")
 ?>
