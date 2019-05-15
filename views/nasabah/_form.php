@@ -83,5 +83,4 @@ use kartik\file\FileInput;
             <?php ActiveForm::end(); ?>  
         </div>
     </div>
-
 </div>

@@ -52,6 +52,13 @@ class NasabahController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
+    // public function actionView($id)
+    // {
+    //     return $this->renderAjax('view', [
+    //         'model' => $this->findModel($id),
+    //     ]);
+    // }
+
     public function actionView($id)
     {
         return $this->render('view', [
@@ -133,23 +140,63 @@ class NasabahController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $oldKtp = $model->foto_ktp;
+        $oldKtp2 = $model->foto_bersama_ktp;
 
         if ($model->load(Yii::$app->request->post())) {
 
-            //upload foto ktp
-            $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
-            $images_name_ktp = 'ktp-'.$model->id.'-'.time().'.'.$imagesKtp->extension;
-            $pathKtp = 'foto/'.$images_name_ktp;
-            if ($imagesKtp->saveAs($pathKtp)) {
-                $model->foto_ktp = $images_name_ktp;
-            }
+            //foto ktp null and foto bersama ktp null
+            if ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') == null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') == null) {
 
-            //upload foto ktp bersama
-            $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
-            $images_name_ktp_2 = 'bersama_ktp-'.$model->id.'-'.time().'.'.$imagesKtp->extension;
-            $pathKtp2 = 'foto/'.$images_name_ktp_2;
-            if ($imagesKtp2->saveAs($pathKtp2)) {
-                $model->foto_bersama_ktp = $images_name_ktp_2;
+                $model->foto_ktp = $oldKtp;
+                $model->foto_bersama_ktp = $oldKtp2;
+
+            //foto ktp not null and foto bersama ktp null
+            } elseif ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') != null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') == null) {
+                
+                //upload foto ktp
+                $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
+                $images_name_ktp = 'ktp-'.$model->id.'-'.time().'.'.$imagesKtp->extension;
+                $pathKtp = 'foto/'.$images_name_ktp;
+                if ($imagesKtp->saveAs($pathKtp)) {
+                    $model->foto_ktp = $images_name_ktp;
+                }
+
+                //no update upload foto ktp bersama
+                $model->foto_bersama_ktp = $oldKtp2;
+
+            //foto ktp null and foto bersama ktp not null
+            } elseif ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') == null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') != null) {
+
+                //no update upload foto ktp
+                $model->foto_ktp = $oldKtp;
+
+                //upload foto ktp bersama
+                $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
+                $images_name_ktp_2 = 'bersama_ktp-'.$model->id.'-'.time().'.'.$imagesKtp2->extension;
+                $pathKtp2 = 'foto/'.$images_name_ktp_2;
+                if ($imagesKtp2->saveAs($pathKtp2)) {
+                    $model->foto_bersama_ktp = $images_name_ktp_2;
+                }
+            
+            //foto ktp not null and foto bersama ktp not null
+            } else {
+
+                //upload foto ktp
+                $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
+                $images_name_ktp = 'ktp-'.$model->id.'-'.time().'.'.$imagesKtp->extension;
+                $pathKtp = 'foto/'.$images_name_ktp;
+                if ($imagesKtp->saveAs($pathKtp)) {
+                    $model->foto_ktp = $images_name_ktp;
+                }
+
+                //upload foto ktp bersama
+                $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
+                $images_name_ktp_2 = 'bersama_ktp-'.$model->id.'-'.time().'.'.$imagesKtp2->extension;
+                $pathKtp2 = 'foto/'.$images_name_ktp_2;
+                if ($imagesKtp2->saveAs($pathKtp2)) {
+                    $model->foto_bersama_ktp = $images_name_ktp_2;
+                }
             }
             
             $model->save(false);
