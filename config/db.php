@@ -1,6 +1,7 @@
 <?php
 
 return [
+
     // 'class' => 'yii\db\Connection',
     // 'dsn' => 'mysql:host=localhost;dbname=pinjaman_online',
     // 'username' => 'root',
