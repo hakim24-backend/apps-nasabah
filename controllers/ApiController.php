@@ -5,6 +5,8 @@ use yii\filters\auth\QueryParamAuth;
 use app\models\Nasabah;
 use app\models\NasabahBukuTelepon;
 use app\models\Akun;
+use app\models\Peminjaman;
+use app\models\Pencicilan;
 use Yii;
 
 class ApiController extends \yii\rest\Controller
@@ -94,7 +96,7 @@ class ApiController extends \yii\rest\Controller
                 $response['status'] = 0;
             }
         }else{
-            $response['message'] = 'Data Tidak boleh kosong';
+            $response['message'] = 'Data tidak boleh kosong';
             $response['status'] = 0;
         }
 
@@ -106,24 +108,34 @@ class ApiController extends \yii\rest\Controller
         $param=\Yii::$app->request->post();
 
         $response= array();
-        if ($param['email']!='' && $param['password']!='') {
+        if ($param['email']!="" && $param['password']!="") {
             
             $nasabah = Nasabah::find()->where(['email'=>$param['email']])->one();
             if ($nasabah) {
             	$akun = Akun::find()->where(['id'=>$nasabah->id_akun])->one();
-            	if ($nasabah->validatePassword($param['password'], $akun->password_hash)) {
-                    $response['message'] = 'Berhasil login';
-        			$response['status'] = 1;
-                }else{
-                    $response['message'] = 'Password tidak sesuai';
-        			$response['status'] = 0;
-                }
+            	if ($akun->id_status_akun == 1) {
+	            	if ($nasabah->validatePassword($param['password'], $akun->password_hash)) {
+	            		$response['id'] = $nasabah->id;
+	        			$response['nama'] = $nasabah->nama;
+	        			$response['email'] = $nasabah->email;
+	        			$response['nomor_telepon'] = $nasabah->nomor_telepon;
+	        			$response['access_token'] = $akun->access_token;
+	                    $response['message'] = 'Berhasil login';
+	        			$response['status'] = 1;
+	                }else{
+	                    $response['message'] = 'Password tidak sesuai';
+	        			$response['status'] = 0;
+	                }
+	            } else {
+	            	$response['message'] = 'Akun tidak aktif';
+	        		$response['status'] = 0;
+	            }
             }else{
                 $response['message'] = 'Email tidak ditemukan';
             	$response['status'] = 0;
             }
         }else{
-            $response['message'] = 'Data Tidak boleh kosong';
+            $response['message'] = 'Data tidak boleh kosong';
             $response['status'] = 0;
         }
 
@@ -150,7 +162,7 @@ class ApiController extends \yii\rest\Controller
                 	}
 
                 	$transaction->commit();
-                	$response['message'] = 'Berhasil mengirim kontak';
+                	$response['message'] = 'Berhasil mendaftar';
             		$response['status'] = 1;
                 } catch (\Exception $e) {
                     $transaction->rollBack();
@@ -158,11 +170,53 @@ class ApiController extends \yii\rest\Controller
                     $response['status'] = 0;
                 }
         	} else {
-        		$response['message'] = 'Data Tidak boleh kosong';
+        		$response['message'] = 'Data tidak boleh kosong';
             	$response['status'] = 0;
         	}
         } else {
-        	$response['message'] = 'Data Tidak boleh kosong';
+        	$response['message'] = 'Data tidak boleh kosong';
+            $response['status'] = 0;
+        }
+
+        return $response; 
+    }
+
+    public function actionCreditList(){
+        $param = Yii::$app->request->get();
+        $response = array();
+
+        if ($param['customer_id']!="") {
+
+        	$customer = Nasabah::find()->where(['id'=>$param['customer_id']])->one();
+
+            if ($customer) {
+
+            	$credit = Peminjaman::find()->asArray()->all();
+
+	        	if ($credit) {
+
+	        		foreach ($credit as $key => $value) {
+	        			if($value['id_status_peminjaman'] == 2){
+	        				$value['payment_count_left'] = 0;
+	        			} else {
+	        				$payment = $value['durasi'] - Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->count();
+	        				$value['payment_count_left'] = $payment;
+	        			}
+	        		}
+
+	        		$response['credit'] = $credit;
+		        	$response['message'] = 'Berhasil mengambil data';
+		            $response['status'] = 1;
+		        } else {
+		        	$response['message'] = 'Peminjaman tidak ditemukan';
+		            $response['status'] = 0;
+		        }
+	        } else {
+	        	$response['message'] = 'Nasabah tidak ditemukan';
+	            $response['status'] = 0;
+	        }
+        } else {
+        	$response['message'] = 'Data tidak boleh kosong';
             $response['status'] = 0;
         }
 
