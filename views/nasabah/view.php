@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="nasabah-view">
 
     <p>
-        <a class="btn btn-danger" href="<?= Url::to(Yii::$app->request->referrer);?>">Kembali</a>
+        <a class="btn btn-danger" href="<?php echo Url::to(['nasabah/index']) ?>">Kembali</a>
     </p>
 
     <div class="box box-info">

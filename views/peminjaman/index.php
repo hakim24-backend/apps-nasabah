@@ -17,7 +17,7 @@ function to_rp($val)
 <div class="peminjaman-index">
 
     <p>
-        <?= Html::a('Tambah Data Peminjaman', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Tambah Data Peminjaman', ['create'], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <div class="box box-info">

@@ -21,6 +21,7 @@
                     ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
                     ['label' => 'Master Nasabah', 'icon' => 'users', 'url' => ['/nasabah/index']],
                     ['label' => 'Peminjaman', 'icon' => 'credit-card', 'url' => ['/peminjaman/index']],
+                    ['label' => 'Pengguna', 'icon' => 'user', 'url' => ['/pengguna/index']],
                     ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
                 ],
             ]
