@@ -1,7 +1,11 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
+use kartik\money\MaskMoney;
+use kartik\file\FileInput;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Peminjaman */
@@ -14,34 +18,97 @@ use yii\widgets\ActiveForm;
         <div class="box-body">
             <?php $form = ActiveForm::begin(); ?>
 
-            <?= $form->field($model, 'nomor_kontrak')->textInput(['maxlength' => true]) ?>
+            <!-- <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?> -->
 
-            <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'nama')->widget(Select2::classname(), [
+                'data' => $nama,
+                'options' => [
+                    'placeholder' => 'Pilih Nasabah...', 
+                    'id'=>'nama',
+                    'required'=>true,
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'initialize' => true,
+                ],
+            ]) ?>
 
-            <?= $form->field($model, 'alamat')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'alamat')->textInput(['maxlength' => true,'required'=>true]) ?>
 
-            <?= $form->field($model, 'nik_ktp')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'nik_ktp')->textInput(['maxlength' => true,'required'=>true]) ?>
 
-            <?= $form->field($model, 'nominal_peminjaman')->textInput() ?>
+            <?= $form->field($model, 'nominal_peminjaman')->widget(MaskMoney::classname(), 
+              [
+                'options' => [
+                    'required'=>true
+                ],
+                'pluginOptions' => [
+                    'prefix' => 'Rp. ',
+                    'suffix' => '',
+                    'affixesStay' => true,
+                    'thousands' => '.',
+                    'decimal' => ',',
+                    'precision' => 0, 
+                    'allowZero' => false,
+                    'allowNegative' => false,
+                ]
+            ]) ?>
 
-            <?= $form->field($model, 'id_jenis_durasi')->textInput() ?>
+            <!-- <?= $form->field($model, 'nominal_peminjaman')->textInput() ?> -->
 
-            <?= $form->field($model, 'durasi')->textInput() ?>
+            <label>Status Peminjaman</label>
+            <?= Html::dropDownlist('status',0,[1=>'Jaminan',2=>'Non-Jaminan'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'status', 'style' => 'width: 100%']) ?>
+            <br>
 
-            <?= $form->field($model, 'jaminan')->textInput(['maxlength' => true]) ?>
+            <div id="jenis">
+            </div>
 
-            <?= $form->field($model, 'foto_ktp')->textInput(['maxlength' => true]) ?>
+            <div id="durasi">
+            </div>
 
-            <?= $form->field($model, 'foto_bersama_ktp')->textInput(['maxlength' => true]) ?>
+            <label>Jenis Durasi</label>
+            <?= Html::dropDownlist('jenis-durasi',0,[1=>'Mingguan',2=>'Bulanan'], ['prompt' => 'Pilih Jenis Durasi...', 'required' => true, 'class' => 'form-control', 'id' => 'jenis-durasi', 'style' => 'width: 100%']) ?>
+            <br>
 
-            <?= $form->field($model, 'tanggal_waktu_pembuatan')->textInput() ?>
+            <?= $form->field($model, 'durasi')->textInput(['maxlength' => true,'required' => true]) ?>
 
-            <?= $form->field($model, 'id_status_peminjaman')->textInput() ?>
+            <?= $form->field($model, 'foto_ktp')->widget(FileInput::classname(), [
+                'options' => [
+                    'accept' => 'image/*',
+                    'required'=>true,
+                ],
+                'pluginOptions' => [
+                    // 'showPreview' => false,
+                    // 'showCaption' => true,
+                    // 'showRemove' => true,
+                    'removeClass' => 'btn btn-danger',
+                    'showUpload' => false,
+                    'removeIcon' => '<i class="glyphicon glyphicon-trash"></i>'
+                ],
+            ]) ?>
 
-            <?= $form->field($model, 'id_pengguna')->textInput() ?>
+            <!-- <?= $form->field($model, 'foto_ktp')->textInput(['maxlength' => true]) ?> -->
+
+            <?= $form->field($model, 'foto_bersama_ktp')->widget(FileInput::classname(), [
+                'options' => [
+                    'accept' => 'image/*',
+                    'required'=>true,
+                ],
+                'pluginOptions' => [
+                    // 'showPreview' => false,
+                    // 'showCaption' => true,
+                    // 'showRemove' => true,
+                    'removeClass' => 'btn btn-danger',
+                    'showUpload' => false,
+                    'removeIcon' => '<i class="glyphicon glyphicon-trash"></i>'
+                ],
+            ]) ?>
+
+            <!-- <?= $form->field($model, 'foto_bersama_ktp')->textInput(['maxlength' => true]) ?> -->
 
             <div class="form-group">
                 <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+                <a class="btn btn-danger" href="<?php echo Url::to(['peminjaman/index']) ?>">Kembali</a>
             </div>
 
             <?php ActiveForm::end(); ?>  
@@ -49,3 +116,34 @@ use yii\widgets\ActiveForm;
     </div>
 
 </div>
+
+<?php
+    $this->registerJs("
+
+        $('#status').on('change',function(){
+            var id = $('#status').val();
+            $.ajax({
+              url : '" . Yii::$app->urlManager->baseUrl."/peminjaman/get-status?id='+id,
+              dataType : 'html',
+              success: function (data) {
+                $('#jenis').html(data);
+              }
+            })
+        });
+
+        $('#jenis-durasi').on('change',function(){
+            var id_status = $('#status').val();
+            var id_durasi = $('#jenis-durasi').val();
+            if(id_status == 2){
+                $.ajax({
+                  url : '" . Yii::$app->urlManager->baseUrl."/peminjaman/get-durasi?id_durasi='+id_durasi,
+                  dataType : 'html',
+                  success: function (data) {
+                    $('#durasi').html(data);
+                  }
+                })
+            }
+        });
+
+    ")
+?>

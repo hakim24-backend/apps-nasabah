@@ -47,8 +47,7 @@ class Peminjaman extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_nasabah', 'id_jenis_peminjaman', 'id_jenis_durasi', 'durasi', 'id_status_peminjaman', 'id_pengguna'], 'integer'],
-            [['nominal_peminjaman'], 'number'],
+            [['id_nasabah', 'id_jenis_peminjaman', 'id_jenis_durasi', 'durasi', 'id_status_peminjaman', 'id_pengguna','nominal_peminjaman'], 'integer'],
             [['tanggal_waktu_pembuatan'], 'safe'],
             [['nomor_kontrak'], 'string', 'max' => 15],
             [['nama', 'alamat', 'jaminan'], 'string', 'max' => 100],
@@ -70,20 +69,20 @@ class Peminjaman extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'id_nasabah' => 'Id Nasabah',
-            'id_jenis_peminjaman' => 'Id Jenis Peminjaman',
+            'id_nasabah' => 'Nama',
+            'id_jenis_peminjaman' => 'Jenis Peminjaman',
             'nomor_kontrak' => 'Nomor Kontrak',
             'nama' => 'Nama',
             'alamat' => 'Alamat',
-            'nik_ktp' => 'Nik Ktp',
+            'nik_ktp' => 'NIK KTP',
             'nominal_peminjaman' => 'Nominal Peminjaman',
-            'id_jenis_durasi' => 'Id Jenis Durasi',
+            'id_jenis_durasi' => 'Jenis Durasi',
             'durasi' => 'Durasi',
             'jaminan' => 'Jaminan',
-            'foto_ktp' => 'Foto Ktp',
-            'foto_bersama_ktp' => 'Foto Bersama Ktp',
+            'foto_ktp' => 'Foto KTP',
+            'foto_bersama_ktp' => 'Foto Bersama KTP',
             'tanggal_waktu_pembuatan' => 'Tanggal Waktu Pembuatan',
-            'id_status_peminjaman' => 'Id Status Peminjaman',
+            'id_status_peminjaman' => 'Status Peminjaman',
             'id_pengguna' => 'Id Pengguna',
         ];
     }

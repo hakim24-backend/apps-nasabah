@@ -9,6 +9,10 @@ use yii\grid\GridView;
 
 $this->title = 'Peminjaman';
 $this->params['breadcrumbs'][] = $this->title;
+function to_rp($val)
+{
+    return "Rp " . number_format($val,0,',','.');
+}
 ?>
 <div class="peminjaman-index">
 
@@ -30,16 +34,33 @@ $this->params['breadcrumbs'][] = $this->title;
                     // 'id_nasabah',
                     // 'id_jenis_peminjaman',
                     'nomor_kontrak',
-                    'nik_ktp',
+                    // 'nik_ktp',
                     'nama',
                     // 'alamat',
-                    'nominal_peminjaman',
+                    [
+                    'attribute' => 'nominal_peminjaman',
+                    'value' => function($model){
+                        return to_rp($model->nominal_peminjaman);
+                    }
+                    ],
                     //'id_jenis_durasi',
                     //'durasi',
                     //'jaminan',
-                    'tanggal_waktu_pembuatan',
-                    'foto_ktp',
-                    'foto_bersama_ktp',
+                    // 'tanggal_waktu_pembuatan',
+                    [
+                        'attribute' => 'foto_ktp',
+                        'format' => 'html',
+                        'value'=>function($data){
+                            return Html::img('../../web/foto/'.$data['foto_ktp'],['width' => '150px']);
+                        }
+                    ],
+                    [
+                        'attribute' => 'foto_bersama_ktp',
+                        'format' => 'html',
+                        'value'=>function($data){
+                            return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
+                        }
+                    ],
                     //'id_status_peminjaman',
                     //'id_pengguna',
 
