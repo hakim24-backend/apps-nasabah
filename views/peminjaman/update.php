@@ -63,7 +63,7 @@ use kartik\select2\Select2;
             <!-- <?= $form->field($model, 'nominal_peminjaman')->textInput() ?> -->
 
             <label>Jenis Peminjaman</label>
-            <?= Html::dropDownlist('status',$model->id_jenis_peminjaman,[1=>'Jaminan',2=>'Non-Jaminan'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'status', 'style' => 'width: 100%']) ?>
+            <?= Html::dropDownlist('status',$model->id_jenis_peminjaman,[1=>'Jaminan',2=>'Non-Jaminan'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true,'disabled'=>true, 'class' => 'form-control', 'id' => 'status', 'style' => 'width: 100%']) ?>
             <br>
 
             <div id="jenis">
@@ -72,9 +72,13 @@ use kartik\select2\Select2;
             <div id="durasi">
             </div>
 
-            <!-- <div id="jaminan">
-            	<?= $form->field($model, 'jaminan')->textInput(['maxlength' => true,'required'=>true]) ?>
-            </div> -->
+            <div id="jaminan">
+                <?php if ($model->id_jenis_peminjaman == 1) { ?>
+                    <?= $form->field($model, 'jaminan')->textInput(['maxlength' => true,'required'=>true]) ?>
+                <?php } else { ?>
+                    <!-- no form -->
+                <?php } ?>
+            </div>
 
             <label>Jenis Durasi</label>
             <?= Html::dropDownlist('jenis-durasi',$model->id_jenis_durasi,[1=>'Mingguan',2=>'Bulanan'], ['prompt' => 'Pilih Jenis Durasi...', 'required' => true, 'class' => 'form-control', 'id' => 'jenis-durasi', 'style' => 'width: 100%']) ?>
@@ -151,6 +155,7 @@ use kartik\select2\Select2;
 	              }
 	            })
             } else {
+                $('#jaminan').hide();
             	$('#jaminan-update').hide();
             }
             

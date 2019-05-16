@@ -118,6 +118,7 @@ class PenggunaController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', "Update Data Pengguna Berhasil");
             return $this->redirect('index');
         }
 
@@ -137,6 +138,7 @@ class PenggunaController extends Controller
     {
         $this->findModel($id)->delete();
 
+        Yii::$app->session->setFlash('success', "Hapus Data Pengguna Berhasil");
         return $this->redirect(['index']);
     }
 

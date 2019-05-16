@@ -69,12 +69,12 @@ class PeminjamanController extends Controller
     public function actionCreate()
     {
         $model = new Peminjaman();
-        $jenis_peminjaman = PeminjamanJenis::find();
 
         //data nasabah
         $nama = ArrayHelper::map(Nasabah::find()->all(), 'id', 'nama');
 
         if ($model->load(Yii::$app->request->post())) {
+
             $post = Yii::$app->request->post();
             $dataNasabah = Nasabah::find()->where(['id'=>$model->nama])->one();
             $nomor_kontrak = $post['nomor_kontrak'];
@@ -100,11 +100,40 @@ class PeminjamanController extends Controller
             $model->id_nasabah = $model->nama;
             $model->nama = $dataNasabah->nama;
             $model->id_jenis_peminjaman = $post['status'];
+            // $model->save(false);
 
             if ($post['status'] == 1) {
                 $model->jaminan = $post['jaminan'];
+                $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminjaman])->one();
+
+                //nominal admin
+                $adminNominal = $model->nominal_peminjaman*$jenisPeminjaman->besar_admin/100;
+
+                //nominal tabungan ditahan
+                $tabunganDitahan = $model->nominal_peminjaman*$jenisPeminjaman->besar_tabungan_ditahan/100;
+
+                //nominal pencicilan
+                $cicilan = (($model->nominal_peminjaman*$model->durasi*$jenisPeminjaman->besar_bunga/100)+($model->nominal_peminjaman))/$model->durasi;
+
+                $model->nominal_admin = $adminNominal;
+                $model->nominal_tabungan_ditahan = $tabunganDitahan;
+                $model->nominal_pencicilan = $cicilan;
             } else {
                 $model->jaminan = null;
+                $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminjaman])->one();
+
+                //nominal admin
+                $adminNominal = $model->nominal_peminjaman*$jenisPeminjaman->besar_admin/100;
+
+                //nominal tabungan ditahan
+                $tabunganDitahan = $model->nominal_peminjaman*$jenisPeminjaman->besar_tabungan_ditahan/100;
+
+                //nominal pencicilan
+                $cicilan = (($model->nominal_peminjaman*$model->durasi*$jenisPeminjaman->besar_bunga/100)+($model->nominal_peminjaman))/$model->durasi;
+
+                $model->nominal_admin = $adminNominal;
+                $model->nominal_tabungan_ditahan = $tabunganDitahan;
+                $model->nominal_pencicilan = $cicilan;
             }
 
             $model->nomor_kontrak = $post['nomor_kontrak'];
@@ -306,15 +335,40 @@ class PeminjamanController extends Controller
                 }
             }
 
-            $model->nama = $dataNasabah->nama;
-            $model->id_jenis_peminjaman = $post['status'];
+            if ($model->id_jenis_peminjaman == 1) {
+                $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminjaman])->one();
 
-            if ($post['status'] == 1) {
-                $model->jaminan = $model->jaminan;
+                //nominal admin
+                $adminNominal = $model->nominal_peminjaman*$jenisPeminjaman->besar_admin/100;
+
+                //nominal tabungan ditahan
+                $tabunganDitahan = $model->nominal_peminjaman*$jenisPeminjaman->besar_tabungan_ditahan/100;
+
+                //nominal pencicilan
+                $cicilan = (($model->nominal_peminjaman*$model->durasi*$jenisPeminjaman->besar_bunga/100)+($model->nominal_peminjaman))/$model->durasi;
+
+                $model->nominal_admin = $adminNominal;
+                $model->nominal_tabungan_ditahan = $tabunganDitahan;
+                $model->nominal_pencicilan = $cicilan;
             } else {
                 $model->jaminan = null;
+                $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminjaman])->one();
+
+                //nominal admin
+                $adminNominal = $model->nominal_peminjaman*$jenisPeminjaman->besar_admin/100;
+
+                //nominal tabungan ditahan
+                $tabunganDitahan = $model->nominal_peminjaman*$jenisPeminjaman->besar_tabungan_ditahan/100;
+
+                //nominal pencicilan
+                $cicilan = (($model->nominal_peminjaman*$model->durasi*$jenisPeminjaman->besar_bunga/100)+($model->nominal_peminjaman))/$model->durasi;
+
+                $model->nominal_admin = $adminNominal;
+                $model->nominal_tabungan_ditahan = $tabunganDitahan;
+                $model->nominal_pencicilan = $cicilan;
             }
 
+            $model->nama = $dataNasabah->nama;
             $model->id_jenis_durasi = $post['jenis-durasi'];
             $model->tanggal_waktu_pembuatan = date('Y-m-d H:i:s');
             $model->id_status_peminjaman = $post['peminjaman'];
