@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Peminjaman;
+use app\models\Pencicilan;
 use app\models\PeminjamanJenis;
 use app\models\Nasabah;
 use app\models\PeminjamanSearch;
@@ -71,82 +72,104 @@ class PeminjamanController extends Controller
     {
         date_default_timezone_set("Asia/Jakarta");
         $model = new Peminjaman();
+        $cicilan = new Pencicilan();
 
         //data nasabah
         $nama = ArrayHelper::map(Nasabah::find()->all(), 'id', 'nama');
 
         if ($model->load(Yii::$app->request->post())) {
-
             $post = Yii::$app->request->post();
-            $dataNasabah = Nasabah::find()->where(['id'=>$model->nama])->one();
-            $nomor_kontrak = $post['nomor_kontrak'];
-            $nomor_kontrak_tipe = str_replace('/','-',$nomor_kontrak);
-            
 
-            //upload foto ktp
-            $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
-            $images_name_ktp = 'ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
-            $pathKtp = 'foto/'.$images_name_ktp;
-            if ($imagesKtp->saveAs($pathKtp)) {
-                $model->foto_ktp = $images_name_ktp;
+            $transaction = \Yii::$app->db->beginTransaction();
+
+            try {
+                $dataNasabah = Nasabah::find()->where(['id'=>$model->nama])->one();
+                $nomor_kontrak = $post['nomor_kontrak'];
+                $nomor_kontrak_tipe = str_replace('/','-',$nomor_kontrak);
+                
+
+                //upload foto ktp
+                $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
+                $images_name_ktp = 'ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
+                $pathKtp = 'foto/'.$images_name_ktp;
+                if ($imagesKtp->saveAs($pathKtp)) {
+                    $model->foto_ktp = $images_name_ktp;
+                }
+
+                //upload foto ktp bersama
+                $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
+                $images_name_ktp_2 = 'bersama_ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
+                $pathKtp2 = 'foto/'.$images_name_ktp_2;
+                if ($imagesKtp2->saveAs($pathKtp2)) {
+                    $model->foto_bersama_ktp = $images_name_ktp_2;
+                }
+
+                $model->id_nasabah = $model->nama;
+                $model->nama = $dataNasabah->nama;
+                $model->id_jenis_peminjaman = $post['status'];
+                // $model->save(false);
+
+                if ($post['status'] == 1) {
+                    $model->jaminan = $post['jaminan'];
+                    $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminjaman])->one();
+
+                    //nominal admin
+                    $adminNominal = $model->nominal_peminjaman*$jenisPeminjaman->besar_admin/100;
+
+                    //nominal tabungan ditahan
+                    $tabunganDitahan = $model->nominal_peminjaman*$jenisPeminjaman->besar_tabungan_ditahan/100;
+
+                    //nominal pencicilan
+                    $cicilan = (($model->nominal_peminjaman*$model->durasi*$jenisPeminjaman->besar_bunga/100)+($model->nominal_peminjaman))/$model->durasi;
+
+                    $model->nominal_admin = $adminNominal;
+                    $model->nominal_tabungan_ditahan = $tabunganDitahan;
+                    $model->nominal_pencicilan = $cicilan;
+                } else {
+                    $model->jaminan = null;
+                    $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminjaman])->one();
+
+                    //nominal admin
+                    $adminNominal = $model->nominal_peminjaman*$jenisPeminjaman->besar_admin/100;
+
+                    //nominal tabungan ditahan
+                    $tabunganDitahan = $model->nominal_peminjaman*$jenisPeminjaman->besar_tabungan_ditahan/100;
+
+                    //nominal pencicilan
+                    $cicilan = (($model->nominal_peminjaman*$model->durasi*$jenisPeminjaman->besar_bunga/100)+($model->nominal_peminjaman))/$model->durasi;
+
+                    $model->nominal_admin = $adminNominal;
+                    $model->nominal_tabungan_ditahan = $tabunganDitahan;
+                    $model->nominal_pencicilan = $cicilan;
+                }
+
+                $model->nomor_kontrak = $post['nomor_kontrak'];
+                $model->id_jenis_durasi = $post['jenis-durasi'];
+                $model->tanggal_waktu_pembuatan = date('Y-m-d H:i:s');
+                $model->id_status_peminjaman = 1;
+                $savePeminjaman = $model->save(false);
+
+                if ($savePeminjaman) {
+
+                    for($i=0; $i < $model->durasi; $i++) {
+                        $cicilan->id_peminjaman = $model->$id;
+                        $cicilan->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
+                        $cicilan->id_jenis_pencicilan = 1;
+                        $cicilan->save(false);   
+                    }
+
+                    return $this->render('detail', [
+                        'model' => $model,
+                    ]);
+                }
+
+            } catch(\Exception $e) {
+
+                $transaction->rollback();
+                Yii::$app->session->setFlash('error', $e->getMessage());
+                return $this->redirect('index');
+
             }
-
-            //upload foto ktp bersama
-            $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
-            $images_name_ktp_2 = 'bersama_ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
-            $pathKtp2 = 'foto/'.$images_name_ktp_2;
-            if ($imagesKtp2->saveAs($pathKtp2)) {
-                $model->foto_bersama_ktp = $images_name_ktp_2;
-            }
-
-            $model->id_nasabah = $model->nama;
-            $model->nama = $dataNasabah->nama;
-            $model->id_jenis_peminjaman = $post['status'];
-            // $model->save(false);
-
-            if ($post['status'] == 1) {
-                $model->jaminan = $post['jaminan'];
-                $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminjaman])->one();
-
-                //nominal admin
-                $adminNominal = $model->nominal_peminjaman*$jenisPeminjaman->besar_admin/100;
-
-                //nominal tabungan ditahan
-                $tabunganDitahan = $model->nominal_peminjaman*$jenisPeminjaman->besar_tabungan_ditahan/100;
-
-                //nominal pencicilan
-                $cicilan = (($model->nominal_peminjaman*$model->durasi*$jenisPeminjaman->besar_bunga/100)+($model->nominal_peminjaman))/$model->durasi;
-
-                $model->nominal_admin = $adminNominal;
-                $model->nominal_tabungan_ditahan = $tabunganDitahan;
-                $model->nominal_pencicilan = $cicilan;
-            } else {
-                $model->jaminan = null;
-                $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminjaman])->one();
-
-                //nominal admin
-                $adminNominal = $model->nominal_peminjaman*$jenisPeminjaman->besar_admin/100;
-
-                //nominal tabungan ditahan
-                $tabunganDitahan = $model->nominal_peminjaman*$jenisPeminjaman->besar_tabungan_ditahan/100;
-
-                //nominal pencicilan
-                $cicilan = (($model->nominal_peminjaman*$model->durasi*$jenisPeminjaman->besar_bunga/100)+($model->nominal_peminjaman))/$model->durasi;
-
-                $model->nominal_admin = $adminNominal;
-                $model->nominal_tabungan_ditahan = $tabunganDitahan;
-                $model->nominal_pencicilan = $cicilan;
-            }
-
-            $model->nomor_kontrak = $post['nomor_kontrak'];
-            $model->id_jenis_durasi = $post['jenis-durasi'];
-            $model->tanggal_waktu_pembuatan = date('Y-m-d H:i:s');
-            $model->id_status_peminjaman = 1;
-            $model->save(false);
-
-            return $this->render('detail', [
-                'model' => $model,
-            ]);
         }
 
         return $this->render('create', [

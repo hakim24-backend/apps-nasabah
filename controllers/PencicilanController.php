@@ -104,19 +104,29 @@ class PencicilanController extends Controller
         }
         $totalCicilan = json_encode($cicilan);
 
-        //lunas dipercepat
-        if ($totalCicilan == '[]') {
-            $intervalDurasi = $peminjaman->durasi - 0;
+        if ($peminjaman->id_jenis_peminjaman == 1) {
+            //lunas dipercepat jaminan
+            if ($totalCicilan == '[]') {
+                $intervalDurasi = $peminjaman->durasi - 0;
+            } else {
+                $intervalDurasi = $peminjaman->durasi - $totalCicilan;
+            }
+            $sisaCicilan = ($peminjaman->nominal_peminjaman/$peminjaman->durasi)*$intervalDurasi;
+            $rumus = ($sisaCicilan)+(5/100*$sisaCicilan);
         } else {
-            $intervalDurasi = $peminjaman->durasi - $totalCicilan;
+            //lunas dipercepat non-jaminan
+            if ($totalCicilan == '[]') {
+                $intervalDurasi = $peminjaman->durasi - 0;
+            } else {
+                $intervalDurasi = $peminjaman->durasi - $totalCicilan;
+            }
+            $sisaCicilan = ($peminjaman->nominal_pencicilan)*$intervalDurasi;
+            $rumus = ($sisaCicilan)+(5/100*$sisaCicilan);
         }
-        $sisaCicilan = ($peminjaman->nominal_peminjaman/$peminjaman->durasi)*$intervalDurasi;
-        $rumus = ($sisaCicilan)+(5/100*$sisaCicilan);
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
 
-            //lunas dipercepat
             if ($post['cicilan'] == 2) {
                 
                 //update status lunas

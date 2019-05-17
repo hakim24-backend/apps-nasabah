@@ -31,6 +31,10 @@ $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminj
 		<h3>Biaya untuk admin = <?= to_rp($model->nominal_admin) ?></h3>
 		<h3>Tabungan ditahan = <?= to_rp($model->nominal_tabungan_ditahan) ?></h3>
 		<h3>Cicilan Per Bulan = <?= to_rp($model->nominal_pencicilan) ?></h3>
-		<h3>Uang yang Diterima nasabah = <?= to_rp($model->nominal_peminjaman  -  $model->nominal_admin) ?></h3>
+		<?php if ($model->id_jenis_peminjaman == 1) { ?>
+			<h3>Uang yang Diterima nasabah = <?= to_rp($model->nominal_peminjaman  -  $model->nominal_admin) ?></h3>
+		<?php } else { ?>
+			<h3>Uang yang Diterima nasabah = <?= to_rp($model->nominal_peminjaman  -  $model->nominal_admin - $model->nominal_tabungan_ditahan) ?></h3>
+		<?php } ?>
 	</div>
 </div>
