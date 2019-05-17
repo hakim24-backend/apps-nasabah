@@ -64,13 +64,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-book"></span>']),['nasabah/phone','id'=>$model->id], ['class' => 'btn btn-success modalButtonView']);
                             },
                             'view' => function($url, $model, $key){
-                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-eye-open"></span>']),['nasabah/view','id'=>$model->id], ['class' => 'btn btn-danger modalButtonView']);
+                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-eye-open"></span>']),['nasabah/view','id'=>$model->id], ['class' => 'btn btn-warning modalButtonView']);
                             },
                             'update'=> function($url, $model, $key){
                                 return  Html::a(Yii::t('app', ' {modelClass}', ['modelClass' => '<span class="glyphicon glyphicon-pencil"></span>']), ['nasabah/update','id'=>$model->id], ['class' => 'btn btn-info modalButtonUpdate']);
                             },
                             'delete'=> function($url, $model, $key){
-                                return  Html::a(Yii::t('app', ' {modelClass}', ['modelClass' => '<span class="glyphicon glyphicon-trash"></span>']), ['nasabah/delete','id'=>$model->id], ['class' => 'btn btn-warning',
+                                return  Html::a(Yii::t('app', ' {modelClass}', ['modelClass' => '<span class="glyphicon glyphicon-trash"></span>']), ['nasabah/delete','id'=>$model->id], ['class' => 'btn btn-danger',
                                     'data' => [
                                         'confirm' => 'Apakah anda yakin untuk menghapus data ini ?',
                                         'method' => 'post',

@@ -25,10 +25,11 @@ function to_rp($val)
             <?php } else { ?>
                 Jenis Peminjaman = Non-jaminan<br>
             <?php } ?>
+            Denda = <?= to_rp($denda) ?><br>
             Nominal Peminjaman = <?=to_rp($info->nominal_peminjaman)?><br>
             Langsung Lunas = <?= to_rp($rumus) ?><br>
             Cicilan per bulan = <?=to_rp($info->nominal_pencicilan)?><br>
-            Tanggal Peminjaman = <?=date("d/m/Y", strtotime($info->tanggal_waktu_pembuatan))?><br>
+            Tanggal Jatuh Tempo = <?=date("d/m/Y", strtotime($cicilanDenda->tanggal_jatuh_tempo))?><br>
             <!-- Jatuh Tempo = <?=date("d/m/Y", strtotime($info->tanggal_waktu_pembuatan."+1 months"))?><br> -->
             <?php if ($totalCicilan == '[]' ) { ?>
                 <?php if ($info->id_jenis_durasi == 1) { ?>

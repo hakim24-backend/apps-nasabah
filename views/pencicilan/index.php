@@ -81,7 +81,7 @@ function to_rp($val)
                                 }
                             },
                             'view' => function($url, $model, $key){
-                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-eye-open"></span>']),['peminjaman/view','id'=>$model->id], ['class' => 'btn btn-danger modalButtonView']);
+                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-eye-open"></span>']),['peminjaman/view','id'=>$model->id], ['class' => 'btn btn-warning modalButtonView']);
                             },
                         ],
                     ],
