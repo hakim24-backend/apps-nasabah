@@ -222,32 +222,18 @@ class ApiController extends \yii\rest\Controller
 	        			$value['pengguna'] = $pengguna['nama'];
 
 	        			if($value['id_status_peminjaman'] == 2){
-							//sisa_pencicilan
-	        				$value['payment_count_left'] = 0;
-
-	        				//due_date
-	        				$value['tanggal_jatuh_tempo'] = "-";
-
-	        				//denda
-	        				$value['denda'] = 0;
+							//sisa_kali_pencicilan
+	        				$value['sisa_kali_pembayaran'] = 0;
 
 	        				//nominal_langsung_lunas
 	        				$value['nominal_langsung_lunas'] = 0;
 	        			} else {
 							//sisa_kali_pencicilan
-							$paid_count = Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->count();
+							$paid_count = Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->andWhere(['id_status_bayar'=>2])->count();
 	        				$difference = $value['durasi'] - $paid_count;
 	        				$value['sisa_kali_pembayaran'] = $difference;
 
-	        				//due_date
-	        				$date=date_create(Peminjaman::getDueDate($value['tanggal_waktu_pembuatan'], $paid_count));
-	        				$value['tanggal_jatuh_tempo'] = date_format($date, 'd F Y');
-
-	        				//denda
-	        				$value['denda'] = Peminjaman::getDenda($value['tanggal_waktu_pembuatan'], $paid_count, $value['nominal_pencicilan'], $jenis_peminjaman->besar_denda);
-
 	        				//nominal_langsung_lunas
-	        				
 	        				$value['nominal_langsung_lunas'] = 0;
 	        			}
 
