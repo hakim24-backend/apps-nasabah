@@ -65,6 +65,7 @@ class PenggunaController extends Controller
      */
     public function actionCreate()
     {
+        date_default_timezone_set("Asia/Jakarta");
         $model = new Pengguna();
         $akun = new Akun();
         $password = 123456;

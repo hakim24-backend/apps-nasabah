@@ -93,6 +93,7 @@ class NasabahController extends Controller
      */
     public function actionCreate()
     {
+        date_default_timezone_set("Asia/Jakarta");
         $model = new Nasabah();
         $akun = new Akun();
         $password = 123456;

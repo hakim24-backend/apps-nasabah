@@ -64,6 +64,24 @@ function to_rp($val)
                         return to_rp($model->nominal_peminjaman);
                     }
                     ],
+                    [
+                    'attribute' => 'nominal_admin',
+                    'value' => function($model){
+                        return to_rp($model->nominal_admin);
+                    }
+                    ],
+                    [
+                    'attribute' => 'nominal_tabungan_ditahan',
+                    'value' => function($model){
+                        return to_rp($model->nominal_tabungan_ditahan);
+                    }
+                    ],
+                    [
+                    'attribute' => 'nominal_pencicilan',
+                    'value' => function($model){
+                        return to_rp($model->nominal_pencicilan);
+                    }
+                    ],
                     'durasi',
                     [
                     'attribute' => 'id_jenis_durasi',

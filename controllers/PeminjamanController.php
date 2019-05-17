@@ -41,6 +41,7 @@ class PeminjamanController extends Controller
     {
         $searchModel = new PeminjamanSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andWhere(['id_status_peminjaman' => 1]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -68,6 +69,7 @@ class PeminjamanController extends Controller
      */
     public function actionCreate()
     {
+        date_default_timezone_set("Asia/Jakarta");
         $model = new Peminjaman();
 
         //data nasabah
@@ -142,8 +144,9 @@ class PeminjamanController extends Controller
             $model->id_status_peminjaman = 1;
             $model->save(false);
 
-            Yii::$app->session->setFlash('success', "Tambah Data Peminjaman Berhasil");
-            return $this->redirect('index');
+            return $this->render('detail', [
+                'model' => $model,
+            ]);
         }
 
         return $this->render('create', [
