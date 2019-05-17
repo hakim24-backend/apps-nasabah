@@ -201,7 +201,7 @@ class ApiController extends \yii\rest\Controller
 
 	        		foreach ($credit as $key => $value) {
 
-	        			//jenis_peminjaman
+	        			//tanggal_peminjaman
 	        			$date=date_create($value['tanggal_waktu_pembuatan']);
 	        			$value['tanggal_waktu_pembuatan'] = date_format($date, 'd F Y');
 
@@ -230,9 +230,11 @@ class ApiController extends \yii\rest\Controller
 
 	        				//denda
 	        				$value['denda'] = 0;
-	        			} else {
 
-							//sisa_pencicilan
+	        				//nominal_langsung_lunas
+	        				$value['nominal_langsung_lunas'] = 0;
+	        			} else {
+							//sisa_kali_pencicilan
 							$paid_count = Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->count();
 	        				$difference = $value['durasi'] - $paid_count;
 	        				$value['sisa_kali_pembayaran'] = $difference;
@@ -243,6 +245,10 @@ class ApiController extends \yii\rest\Controller
 
 	        				//denda
 	        				$value['denda'] = Peminjaman::getDenda($value['tanggal_waktu_pembuatan'], $paid_count, $value['nominal_pencicilan'], $jenis_peminjaman->besar_denda);
+
+	        				//nominal_langsung_lunas
+	        				
+	        				$value['nominal_langsung_lunas'] = 0;
 	        			}
 
 	        			$credit[$key] = $value;
@@ -259,6 +265,93 @@ class ApiController extends \yii\rest\Controller
 	        	$response['message'] = 'Nasabah tidak ditemukan';
 	            $response['status'] = 0;
 	        }
+        } else {
+        	$response['message'] = 'Data tidak boleh kosong';
+            $response['status'] = 0;
+        }
+
+        return $response; 
+    }
+
+    public function actionCreditView(){
+
+		$param = Yii::$app->request->get();
+        $response = array();
+
+    	if ($param['credit_id']!="") {
+
+        	$credit = Peminjaman::find()->where(['id'=>$param['credit_id']])->asArray()->one();
+
+        	if ($credit) {
+
+    			//tanggal_peminjaman
+    			$date=date_create($credit['tanggal_waktu_pembuatan']);
+    			$credit['tanggal_waktu_pembuatan'] = date_format($date, 'd F Y');
+
+    			//jenis_peminjaman
+    			$jenis_peminjaman = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->one();
+    			$credit['jenis_peminjaman'] = $jenis_peminjaman->jenis_peminjaman;
+
+    			//jenis_durasi_peminjaman
+    			$jenis_durasi = PeminjamanDurasiJenis::find()->where(['id'=>$credit['id_jenis_durasi']])->one();
+    			$credit['jenis_durasi'] = $jenis_durasi->durasi_peminjaman;
+
+    			//status_peminjaman
+    			$status_peminjaman = PeminjamanStatus::find()->where(['id'=>$credit['id_status_peminjaman']])->one();
+    			$credit['status_peminjaman'] = $status_peminjaman->status_peminjaman;
+
+    			//nama_pelayan
+    			$pengguna = Pengguna::find()->where(['id'=>$credit['id_pengguna']])->one();
+    			$credit['pengguna'] = $pengguna['nama'];
+
+    			$pencicilan = Pencicilan::find()->where(['id_peminjaman'=>$credit['id']])->asArray()->all();
+
+    			for($i = 0; $i < ($credit['durasi'] - count($pencicilan)); $i++){
+    				$temp = array();
+
+    				// $temp['']
+
+    				// $credit['bill'][$i] = 
+    			}
+
+    			if($credit['id_status_peminjaman'] == 2){
+					//sisa_pencicilan
+    				$credit['payment_count_left'] = 0;
+
+    				//due_date
+    				$credit['tanggal_jatuh_tempo'] = "-";
+
+    				//denda
+    				$credit['denda'] = 0;
+
+    				//nominal_langsung_lunas
+    				$credit['nominal_langsung_lunas'] = 0;
+    			} else {
+					//sisa_kali_pencicilan
+					$paid_count = Pencicilan::find()->where(['id_peminjaman'=>$credit['id']])->count();
+    				$difference = $credit['durasi'] - $paid_count;
+    				$credit['sisa_kali_pembayaran'] = $difference;
+
+    				//due_date
+    				$date=date_create(Peminjaman::getDueDate($credit['tanggal_waktu_pembuatan'], $paid_count));
+    				$credit['tanggal_jatuh_tempo'] = date_format($date, 'd F Y');
+
+    				//denda
+    				$credit['denda'] = Peminjaman::getDenda($credit['tanggal_waktu_pembuatan'], $paid_count, $credit['nominal_pencicilan'], $jenis_peminjaman->besar_denda);
+
+    				//nominal_langsung_lunas
+
+    				$credit['nominal_langsung_lunas'] = 0;
+    			}
+
+        		$response['credit'] = $credit;
+	        	$response['message'] = 'Berhasil mengambil data';
+	            $response['status'] = 1;
+	        } else {
+	        	$response['message'] = 'Peminjaman tidak ditemukan';
+	            $response['status'] = 0;
+	        }
+	        
         } else {
         	$response['message'] = 'Data tidak boleh kosong';
             $response['status'] = 0;
