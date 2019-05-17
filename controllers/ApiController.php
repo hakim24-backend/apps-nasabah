@@ -229,15 +229,12 @@ class ApiController extends \yii\rest\Controller
 	        				$value['payment_count_left'] = 0;
 	        			} else {
 							//sisa_pencicilan
-	        				$difference = $value['durasi'] - Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->count();
+							$paid_count = Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->count();
+	        				$difference = $value['durasi'] - $paid_count;
 	        				$value['sisa_kali_pembayaran'] = $difference;
 
 	        				//denda
-	        				
-	        				// $denda = 
-	        				$value['denda'] = 0;
-
-							
+	        				$value['denda'] = Peminjaman::getDenda($value['tanggal_waktu_pembuatan'], $paid_count, $value['nominal_pencicilan'], $jenis_peminjaman->besar_denda);
 	        			}
 
 	        			$credit[$key] = $value;
