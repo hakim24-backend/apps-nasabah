@@ -6,6 +6,10 @@ use app\models\Nasabah;
 use app\models\NasabahBukuTelepon;
 use app\models\Akun;
 use app\models\Peminjaman;
+use app\models\PeminjamanDurasiJenis;
+use app\models\PeminjamanJenis;
+use app\models\PeminjamanStatus;
+use app\models\Pengguna;
 use app\models\Pencicilan;
 use Yii;
 
@@ -191,17 +195,52 @@ class ApiController extends \yii\rest\Controller
 
             if ($customer) {
 
-            	$credit = Peminjaman::find()->asArray()->all();
+            	$credit = Peminjaman::find()->where(['id_nasabah'=>$param['customer_id']])->asArray()->all();
 
 	        	if ($credit) {
 
 	        		foreach ($credit as $key => $value) {
+
+	        			//jenis_peminjaman
+	        			$date=date_create($value['tanggal_waktu_pembuatan']);
+	        			$value['tanggal_waktu_pembuatan'] = date_format($date, 'd M Y');
+
+	        			//jenis_peminjaman
+	        			$jenis_peminjaman = PeminjamanJenis::find()->where(['id'=>$value['id_jenis_peminjaman']])->one();
+	        			$value['jenis_peminjaman'] = $jenis_peminjaman->jenis_peminjaman;
+
+	        			//jenis_durasi_peminjaman
+	        			$jenis_durasi = PeminjamanDurasiJenis::find()->where(['id'=>$value['id_jenis_durasi']])->one();
+	        			$value['jenis_durasi'] = $jenis_durasi->durasi_peminjaman;
+
+	        			//status_peminjaman
+	        			$status_peminjaman = PeminjamanStatus::find()->where(['id'=>$value['id_status_peminjaman']])->one();
+	        			$value['status_peminjaman'] = $status_peminjaman->status_peminjaman;
+
+	        			//nama_pelayan
+	        			$pengguna = Pengguna::find()->where(['id'=>$value['id_pengguna']])->one();
+	        			$value['pengguna'] = $pengguna['nama'];
+
 	        			if($value['id_status_peminjaman'] == 2){
+	        				//denda
+	        				$value['denda'] = 0;
+
+	        				//sisa_pencicilan
 	        				$value['payment_count_left'] = 0;
 	        			} else {
-	        				$payment = $value['durasi'] - Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->count();
-	        				$value['payment_count_left'] = $payment;
+							//sisa_pencicilan
+	        				$difference = $value['durasi'] - Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->count();
+	        				$value['sisa_kali_pembayaran'] = $difference;
+
+	        				//denda
+	        				
+	        				// $denda = 
+	        				$value['denda'] = 0;
+
+							
 	        			}
+
+	        			$credit[$key] = $value;
 	        		}
 
 	        		$response['credit'] = $credit;
