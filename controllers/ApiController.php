@@ -203,7 +203,7 @@ class ApiController extends \yii\rest\Controller
 
 	        			//jenis_peminjaman
 	        			$date=date_create($value['tanggal_waktu_pembuatan']);
-	        			$value['tanggal_waktu_pembuatan'] = date_format($date, 'd M Y');
+	        			$value['tanggal_waktu_pembuatan'] = date_format($date, 'd F Y');
 
 	        			//jenis_peminjaman
 	        			$jenis_peminjaman = PeminjamanJenis::find()->where(['id'=>$value['id_jenis_peminjaman']])->one();
@@ -222,16 +222,24 @@ class ApiController extends \yii\rest\Controller
 	        			$value['pengguna'] = $pengguna['nama'];
 
 	        			if($value['id_status_peminjaman'] == 2){
+							//sisa_pencicilan
+	        				$value['payment_count_left'] = 0;
+
+	        				//due_date
+	        				$value['tanggal_jatuh_tempo'] = "-";
+
 	        				//denda
 	        				$value['denda'] = 0;
-
-	        				//sisa_pencicilan
-	        				$value['payment_count_left'] = 0;
 	        			} else {
+
 							//sisa_pencicilan
 							$paid_count = Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->count();
 	        				$difference = $value['durasi'] - $paid_count;
 	        				$value['sisa_kali_pembayaran'] = $difference;
+
+	        				//due_date
+	        				$date=date_create(Peminjaman::getDueDate($value['tanggal_waktu_pembuatan'], $paid_count));
+	        				$value['tanggal_jatuh_tempo'] = date_format($date, 'd F Y');
 
 	        				//denda
 	        				$value['denda'] = Peminjaman::getDenda($value['tanggal_waktu_pembuatan'], $paid_count, $value['nominal_pencicilan'], $jenis_peminjaman->besar_denda);
