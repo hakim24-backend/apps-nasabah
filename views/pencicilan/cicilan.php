@@ -18,7 +18,6 @@ function to_rp($val)
 <div class="pencicilan-index">
 
     <p>
-        <?= Html::a('Tambah Data Cicilan', ['create','id' => $id], ['class' => 'btn btn-primary']) ?>
         <a class="btn btn-danger" href="<?php echo Url::to(['pencicilan/index']) ?>">Kembali</a>
     </p>
 
@@ -72,19 +71,31 @@ function to_rp($val)
                         return to_rp($model->nominal_cicilan);
                     }
                     ],
-                    'tanggal_waktu_cicilan',
+                    [
+                    'attribute' => 'tanggal_waktu_cicilan',
+                    'value' => function($model){
+                        if ($model->tanggal_waktu_cicilan == null) {
+                            return 'Belum ada';
+                        } else {
+                            return $model->tanggal_waktu_cicilan;
+                        }
+                    }
+                    ],
                     // 'id_pengguna',
                     //'id_jenis_pencicilan',
 
                     [
                         'class' => 'yii\grid\ActionColumn',
-                        'template' => '{view} {delete}',
+                        'template' => '{create} {view} {delete}',
                         'buttons' => [
+                            'create' => function($url, $model, $key){
+                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-plus"></span>']),['pencicilan/create','id'=>$model->id], ['class' => 'btn btn-success modalButtonView']);
+                            },
                             'view' => function($url, $model, $key){
-                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-eye-open"></span>']),['pencicilan/view','id'=>$model->id], ['class' => 'btn btn-danger modalButtonView']);
+                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-eye-open"></span>']),['pencicilan/view','id'=>$model->id], ['class' => 'btn btn-warning modalButtonView']);
                             },
                             'delete'=> function($url, $model, $key){
-                                return  Html::a(Yii::t('app', ' {modelClass}', ['modelClass' => '<span class="glyphicon glyphicon-trash"></span>']), ['pencicilan/delete','id'=>$model->id], ['class' => 'btn btn-warning',
+                                return  Html::a(Yii::t('app', ' {modelClass}', ['modelClass' => '<span class="glyphicon glyphicon-trash"></span>']), ['pencicilan/delete','id'=>$model->id], ['class' => 'btn btn-danger',
                                     'data' => [
                                         'confirm' => 'Apakah anda yakin untuk menghapus data ini ?',
                                         'method' => 'post',

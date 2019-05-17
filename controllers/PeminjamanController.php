@@ -72,7 +72,6 @@ class PeminjamanController extends Controller
     {
         date_default_timezone_set("Asia/Jakarta");
         $model = new Peminjaman();
-        $cicilan = new Pencicilan();
 
         //data nasabah
         $nama = ArrayHelper::map(Nasabah::find()->all(), 'id', 'nama');
@@ -152,12 +151,16 @@ class PeminjamanController extends Controller
                 if ($savePeminjaman) {
 
                     for($i=0; $i < $model->durasi; $i++) {
-                        $cicilan->id_peminjaman = $model->$id;
-                        $cicilan->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
+                        $cicilan = new Pencicilan();
+                        $cicilan->id_peminjaman = $model->id;
                         $cicilan->id_jenis_pencicilan = 1;
+                        $cicilan->periode = ($i + 1);
+                        $cicilan->id_status_bayar = 1;
+                        $cicilan->tanggal_jatuh_tempo = Peminjaman::getDueDate($model->tanggal_waktu_pembuatan, $i);
                         $cicilan->save(false);   
                     }
 
+                    $transaction->commit();
                     return $this->render('detail', [
                         'model' => $model,
                     ]);
