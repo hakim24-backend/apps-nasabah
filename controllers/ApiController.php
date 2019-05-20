@@ -83,12 +83,26 @@ class ApiController extends \yii\rest\Controller
 	                        move_uploaded_file($param['with_ktp']['tmp_name'], $filedest);
 	                        $nasabah->foto_bersama_ktp = $name;
 
-	                        $nasabah->save(false);
+	                        if($nasabah->save(false)){
 
-	                        $response['message'] = "Registrasi berhasil";
-	                        $response['status'] = 1;
-	                        $response['customer_id'] = $nasabah->id;
-	                        $transaction->commit();
+								$email = \Yii::$app->mailer->compose('index')
+	                                ->setTo($nasabah->email)
+	                                ->setFrom(['mamorasoft.firebase@gmail.com'])
+	                                ->setSubject('Signup Confirmation')
+	                                ->send();
+
+	                            if ($email){
+	                            	$response['message'] = "Registrasi berhasil";
+			                        $response['status'] = 1;
+			                        $response['customer_id'] = $nasabah->id;
+		                        	$transaction->commit();
+		                    	} else {
+		                    		$transaction->rollBack();
+				                    $response['message'] = "Gagal mengirim email konfirmasi";
+				                    $response['status'] = 0;
+		                    	}
+		                    }
+                           
 	                    }
 	                }
 
