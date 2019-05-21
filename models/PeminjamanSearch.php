@@ -17,9 +17,8 @@ class PeminjamanSearch extends Peminjaman
     public function rules()
     {
         return [
-            [['id', 'id_nasabah', 'id_jenis_peminjaman', 'id_jenis_durasi', 'durasi', 'id_status_peminjaman', 'id_pengguna'], 'integer'],
+            [['id', 'id_nasabah', 'id_jenis_durasi', 'durasi', 'id_pengguna'], 'integer'],
             [['nomor_kontrak', 'nama', 'alamat', 'nik_ktp', 'jaminan','tanggal_waktu_pembuatan'], 'safe'],
-            [['nominal_peminjaman'], 'number'],
         ];
     }
 
@@ -61,12 +60,10 @@ class PeminjamanSearch extends Peminjaman
         $query->andFilterWhere([
             'id' => $this->id,
             'id_nasabah' => $this->id_nasabah,
-            'id_jenis_peminjaman' => $this->id_jenis_peminjaman,
             'nominal_peminjaman' => $this->nominal_peminjaman,
             'id_jenis_durasi' => $this->id_jenis_durasi,
             'durasi' => $this->durasi,
             'tanggal_waktu_pembuatan' => $this->tanggal_waktu_pembuatan,
-            'id_status_peminjaman' => $this->id_status_peminjaman,
             'id_pengguna' => $this->id_pengguna,
         ]);
 

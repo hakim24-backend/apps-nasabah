@@ -42,11 +42,11 @@ class Nasabah extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['jenis_kelamin'], 'required'],
             [['id_akun'], 'integer'],
             [['tanggal_lahir'], 'safe'],
             [['latitude', 'longitude'], 'number'],
             [['nama', 'alamat', 'tempat_lahir', 'email'], 'string', 'max' => 100],
-            [['jenis_kelamin'], 'string', 'max' => 15],
             [['nomor_telepon'], 'string', 'max' => 20],
             [['foto_ktp'], 'file', 'extensions' => 'jpg, png, jpeg'],
             [['foto_ktp', 'foto_bersama_ktp', 'access_token'], 'string', 'max' => 255],
@@ -61,7 +61,7 @@ class Nasabah extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'id_akun' => 'Id Akun',
+            'id_akun' => 'Jenis Pinjaman',
             'nama' => 'Nama',
             'alamat' => 'Alamat',
             'tempat_lahir' => 'Tempat Lahir',
@@ -99,6 +99,14 @@ class Nasabah extends \yii\db\ActiveRecord
     public function getPeminjamen()
     {
         return $this->hasMany(Peminjaman::className(), ['id_nasabah' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPeminjamanOne()
+    {
+        return $this->hasOne(Peminjaman::className(), ['id_nasabah' => 'id']);
     }
 
     public function validatePassword($password, $password_hash)

@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\bootstrap\Modal;
+use app\models\Peminjaman;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\NasabahSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -36,7 +37,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     // 'tempat_lahir',
                     // 'tanggal_lahir',
                     // 'jenis_kelamin',
-                    'nomor_telepon',
+                    // [
+                    //     'attribute' => 'id_akun',
+                    //     'format' => 'raw',
+                    //     'value'=>function($model){
+                    //         $data = Peminjaman::find()->where(['id_nasabah'=>$model['id']])->one();
+                    //         if ($data['id_jenis_peminjaman'] == 1) {
+                    //             return 'Jaminan';
+                    //         } elseif ($data['id_jenis_peminjaman'] == 2) {
+                    //             return 'Non-jaminan';
+                    //         } else {
+                    //             return 'Belum melakukan pinjaman';
+                    //         }
+                    //     }
+                    // ],
                     // 'email:email',
                     [
                         'attribute' => 'foto_ktp',
@@ -58,8 +72,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     [
                         'class' => 'yii\grid\ActionColumn',
-                        'template' => '{telepon} {view} {update} {delete}',
+                        'template' => '{monitor} {telepon} {view} {update} {delete}',
+                        'contentOptions' => ['style'=>'text-align: right'],
                         'buttons' => [
+
+                            'monitor' => function($url, $model, $key){
+                                $data = Peminjaman::find()->where(['id_nasabah'=>$model['id']])->andWhere(['id_status_peminjaman'=>1])->count();
+                                if ($data > 0 ) {
+                                    return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-map-marker"></span>']),['nasabah/monitor','id'=>$model->id], ['class' => 'btn btn-primary modalButtonView']);
+                                }
+                            },
                             'telepon' => function($url, $model, $key){
                                 return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-book"></span>']),['nasabah/phone','id'=>$model->id], ['class' => 'btn btn-success modalButtonView']);
                             },

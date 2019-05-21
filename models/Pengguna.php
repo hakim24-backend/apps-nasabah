@@ -36,10 +36,10 @@ class Pengguna extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['jenis_kelamin'], 'required'],
             [['tanggal_lahir'], 'safe'],
             [['id_akun'], 'integer'],
             [['nama', 'alamat', 'email'], 'string', 'max' => 100],
-            [['jenis_kelamin'], 'string', 'max' => 15],
             [['tempat_lahir'], 'string', 'max' => 50],
             [['email'], 'unique'],
             [['id_akun'], 'exist', 'skipOnError' => true, 'targetClass' => Akun::className(), 'targetAttribute' => ['id_akun' => 'id']],

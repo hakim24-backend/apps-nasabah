@@ -17,7 +17,7 @@ class NasabahSearch extends Nasabah
     public function rules()
     {
         return [
-            [['id', 'id_akun'], 'integer'],
+            [['id'], 'integer'],
             [['nama', 'alamat', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'nomor_telepon', 'email'], 'safe'],
             [['latitude', 'longitude'], 'number'],
         ];
@@ -60,7 +60,6 @@ class NasabahSearch extends Nasabah
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'id_akun' => $this->id_akun,
             'tanggal_lahir' => $this->tanggal_lahir,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,

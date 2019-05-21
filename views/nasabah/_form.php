@@ -35,7 +35,7 @@ use kartik\file\FileInput;
 
             <!-- <?= $form->field($model, 'jenis_kelamin')->textInput(['maxlength' => true, 'required'=>true]) ?> -->
 
-            <?= $form->field($model, 'nomor_telepon')->textInput(['maxlength' => true, 'required'=>true]) ?>
+            <?= $form->field($model, 'nomor_telepon')->textInput(['maxlength' => true, 'type' => 'number','required'=>true]) ?>
 
             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'required'=>true]) ?>
 
@@ -71,9 +71,12 @@ use kartik\file\FileInput;
                 ],
             ]) ?>
 
-            <!-- <?= $form->field($model, 'foto_bersama_ktp')->textInput(['maxlength' => true, 'required'=>true]) ?> -->
+            <?= $form->field($model, 'jenis_kelamin')->radioList(
+                array('Pria'=>'Pria','Wanita'=>'Wanita'),
+                array('required'=>true)
+            ); ?>
 
-            <?= $form->field($model, 'jenis_kelamin')->radioList(array('Pria'=>'Pria','Wanita'=>'Wanita')); ?>
+            <!-- <?= $form->field($model, 'foto_bersama_ktp')->textInput(['maxlength' => true, 'required'=>true]) ?> -->
 
             <div class="form-group">
                 <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

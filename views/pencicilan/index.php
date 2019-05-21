@@ -74,6 +74,7 @@ function to_rp($val)
                     [
                         'class' => 'yii\grid\ActionColumn',
                         'template' => '{cicilan} {view}',
+                        'contentOptions' => ['style'=>'text-align: right'],
                         'buttons' => [
                             'cicilan' => function($url, $model, $key){
                                 if ($model->id_status_peminjaman == 1) {
@@ -81,7 +82,7 @@ function to_rp($val)
                                 }
                             },
                             'view' => function($url, $model, $key){
-                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-eye-open"></span>']),['peminjaman/view','id'=>$model->id], ['class' => 'btn btn-warning modalButtonView']);
+                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-eye-open"></span>']),['pencicilan/view-cicilan','id'=>$model->id], ['class' => 'btn btn-warning modalButtonView']);
                             },
                         ],
                     ],

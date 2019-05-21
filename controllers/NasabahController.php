@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Nasabah;
+use app\models\Peminjaman;
 use app\models\Akun;
 use app\models\NasabahBukuTelepon;
 use app\models\NasabahBukuTeleponSearch;
@@ -83,6 +84,15 @@ class NasabahController extends Controller
         return $this->render('phone', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionMonitor($id)
+    {
+        $model = Nasabah::find()->where(['id'=>$id])->one();
+
+        return $this->render('monitor', [
+            'model' => $model,
         ]);
     }
 
@@ -240,18 +250,24 @@ class NasabahController extends Controller
     public function actionDelete($id)
     {
         $model = Nasabah::find()->where(['id'=>$id])->one();
+        $peminjaman = Peminjaman::find()->where(['id_nasabah'=>$model->id])->one();
 
-        if(file_exists('foto/'.$model->foto_ktp) && file_exists('foto/'.$model->foto_bersama_ktp))
-        {
-            unlink('foto/'.$model->foto_ktp);
-            unlink('foto/'.$model->foto_bersama_ktp);
-            $model->delete();
+        if ($peminjaman) {
+            Yii::$app->session->setFlash('error', "Nasabah sedang melakukan transaksi peminjaman");
+            return $this->redirect(['index']);
         } else {
-            $model->delete();
-        }
+            if(file_exists('foto/'.$model->foto_ktp) && file_exists('foto/'.$model->foto_bersama_ktp))
+            {
+                unlink('foto/'.$model->foto_ktp);
+                unlink('foto/'.$model->foto_bersama_ktp);
+                $model->delete();
+            } else {
+                $model->delete();
+            }
 
-        Yii::$app->session->setFlash('success', "Hapus Data Nasabah Berhasil");
-        return $this->redirect(['index']);
+            Yii::$app->session->setFlash('success', "Hapus Data Nasabah Berhasil");
+            return $this->redirect(['index']);
+        }
     }
 
     /**

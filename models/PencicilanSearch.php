@@ -17,9 +17,7 @@ class PencicilanSearch extends Pencicilan
     public function rules()
     {
         return [
-            [['id', 'id_peminjaman', 'id_pengguna', 'id_jenis_pencicilan'], 'integer'],
-            [['nominal_cicilan'], 'number'],
-            [['tanggal_waktu_cicilan'], 'safe'],
+            [['id', 'id_peminjaman', 'id_pengguna', 'id_jenis_pencicilan'], 'integer']
         ];
     }
 
@@ -61,8 +59,6 @@ class PencicilanSearch extends Pencicilan
         $query->andFilterWhere([
             'id' => $this->id,
             'id_peminjaman' => $this->id_peminjaman,
-            'nominal_cicilan' => $this->nominal_cicilan,
-            'tanggal_waktu_cicilan' => $this->tanggal_waktu_cicilan,
             'id_pengguna' => $this->id_pengguna,
             'id_jenis_pencicilan' => $this->id_jenis_pencicilan,
         ]);
