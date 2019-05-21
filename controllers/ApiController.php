@@ -92,6 +92,8 @@ class ApiController extends \yii\rest\Controller
 			                        move_uploaded_file($param['with_ktp']['tmp_name'], $filedest);
 			                        $nasabah->foto_bersama_ktp = $name;
 
+			                        $nasabah->save(false);
+
 	                            	$response['message'] = "Registrasi berhasil";
 			                        $response['status'] = 1;
 			                        $response['customer_id'] = $nasabah->id;
@@ -371,8 +373,7 @@ class ApiController extends \yii\rest\Controller
 			        		} else {
 			        			$amount_left += ($credit['nominal_peminjaman'] / $credit['durasi']);
 			        		}
-			        	} 
-			        	else {
+			        	} else {
 			        		if($current_period == 0){
 		        				if($value['id_status_bayar'] == 1){
 		        					$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
