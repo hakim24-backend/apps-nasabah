@@ -327,8 +327,8 @@ class ApiController extends \yii\rest\Controller
 	        			// $value['nominal_denda'] = Peminjaman::getDenda($credit['id_jenis_durasi'], $value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
 	        			$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
 	        		} else {
-	        			if($value['id_jenis_pencicilan'] == 1){
-		        			$value['nominal_denda'] = $value['nominal_cicilan'] - $credit['nominal_pencicilan'];
+	        			if($value['nominal_denda_dibayar'] != null && $value['nominal_denda_dibayar'] > 0 ){
+		        			$value['nominal_denda'] = $value['nominal_denda_dibayar'];
 		        		} else {
 		        			$value['nominal_denda'] = 0;
 		        		}
@@ -380,7 +380,7 @@ class ApiController extends \yii\rest\Controller
 		        						$get_late_penalty = 1;
 		        					}
 		        				} else {
-		        					if($value['nominal_cicilan'] > $credit['nominal_pencicilan']){
+		        					if($value['nominal_denda_dibayar'] != null && $value['nominal_denda_dibayar'] > 0 ){
 		        						$get_late_penalty = 1;
 		        					}
 		        				}
