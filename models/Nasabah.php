@@ -42,7 +42,6 @@ class Nasabah extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tanggal_waktu_posisi'], 'safe'],
             [['id_akun'], 'integer'],
             [['tanggal_lahir'], 'safe'],
             [['latitude', 'longitude'], 'number'],
@@ -52,6 +51,7 @@ class Nasabah extends \yii\db\ActiveRecord
             [['foto_ktp'], 'file', 'extensions' => 'jpg, png, jpeg'],
             [['foto_ktp', 'foto_bersama_ktp', 'access_token'], 'string', 'max' => 255],
             [['id_akun'], 'exist', 'skipOnError' => true, 'targetClass' => Akun::className(), 'targetAttribute' => ['id_akun' => 'id']],
+            [['tanggal_waktu_posisi'], 'safe'],
         ];
     }
 

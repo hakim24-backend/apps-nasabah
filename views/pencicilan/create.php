@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model app\models\Pencicilan */
 
 $this->title = 'Tambah Data Cicilan Nasabah';
-$this->params['breadcrumbs'][] = ['label' => 'Pencicilans', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Data Cicilan', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

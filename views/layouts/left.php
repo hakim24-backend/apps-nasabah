@@ -18,10 +18,10 @@
                 'options' => ['class' => 'sidebar-menu tree', 'data-widget'=> 'tree'],
                 'items' => [
                     ['label' => 'Menu Pinjaman Online', 'options' => ['class' => 'header']],
-                    ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
+                    // ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
                     ['label' => 'Master Nasabah', 'icon' => 'users', 'url' => ['/nasabah/index']],
                     ['label' => 'Peminjaman', 'icon' => 'credit-card', 'url' => ['/peminjaman/index']],
-                    ['label' => 'Pencicilan', 'icon' => 'credit-card', 'url' => ['/pencicilan/index']],
+                    ['label' => 'Pencicilan', 'icon' => 'balance-scale', 'url' => ['/pencicilan/index']],
                     ['label' => 'Pengguna', 'icon' => 'user', 'url' => ['/pengguna/index']],
                     ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
                 ],

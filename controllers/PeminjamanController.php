@@ -42,7 +42,7 @@ class PeminjamanController extends Controller
     {
         $searchModel = new PeminjamanSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->query->andWhere(['id_status_peminjaman' => 1]);
+        // $dataProvider->query->andWhere(['id_status_peminjaman' => 1]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,

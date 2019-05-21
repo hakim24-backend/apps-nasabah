@@ -1,21 +1,130 @@
 <?php
 
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+use yii\helpers\Url;
+use kartik\money\MaskMoney;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Pencicilan */
 
-$this->title = 'Update Pencicilan: ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Pencicilans', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->title = 'Update Cicilan';
+$this->params['breadcrumbs'][] = ['label' => 'Data Cicilan', 'url' => ['index']];
+$this->params['breadcrumbs'][] = $this->title;
+function to_rp($val)
+{
+    return "Rp " . number_format($val,0,',','.');
+}
 ?>
-<div class="pencicilan-update">
+<div class="pencicilan-form">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="box box-info">
+        <div class="box-body">
+            <b>Info</b><br>
+            <?php if ($info->id_jenis_peminjaman == 1) { ?>
+                Jenis Peminjaman = Jaminan<br>
+            <?php } else { ?>
+                Jenis Peminjaman = Non-jaminan<br>
+            <?php } ?>
+            Denda = <?= to_rp($denda) ?><br>
+            Nominal Peminjaman = <?=to_rp($info->nominal_peminjaman)?><br>
+            Langsung Lunas = 
+            <div id="cicilan-lunas" style="display:inline"> 
+                <?= to_rp($rumus) ?>
+            </div><br>
+            Cicilan per bulan = 
+            <div id="cicilan-bulan" style="display:inline"> 
+                <?=to_rp($info->nominal_pencicilan)?>
+            </div><br>
+            Tanggal Jatuh Tempo = <?=date("d/m/Y", strtotime($cicilanDenda->tanggal_jatuh_tempo))?><br>
+            <!-- Jatuh Tempo = <?=date("d/m/Y", strtotime($info->tanggal_waktu_pembuatan."+1 months"))?><br> -->
+            <?php if ($totalCicilan == '[]' ) { ?>
+                <?php if ($info->id_jenis_durasi == 1) { ?>
+                    Durasi = <?=$info->durasi?> Minggu<br>
+                    Total Cicilan Perminggu = 0x
+                <?php } else { ?>
+                    Durasi = <?=$info->durasi?> Bulan<br>
+                    Total Cicilan Perbulan = 0x
+                <?php } ?>
+            <?php } else { ?>
+                <?php if ($info->id_jenis_durasi == 1) { ?>
+                    Durasi = <?=$info->durasi?> Minggu<br>
+                    Total Cicilan Perminggu = <?=$totalCicilan?>x
+                <?php } else { ?>
+                    Durasi = <?=$info->durasi?> Bulan<br>
+                    Total Cicilan Perbulan = <?=$totalCicilan?>x
+                <?php } ?>
+            <?php } ?> 
+        </div>
+    </div>
 
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+    <div class="box box-info">
+        <div class="box-body">
+            <?php $form = ActiveForm::begin(); ?>
+
+            <label>Jenis Cicilan</label>
+            <?= Html::dropDownlist('cicilan',$model->id_jenis_pencicilan,[1=>'Sesuai Durasi',2=>'Langsung Lunas'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>
+            <br>
+
+            <?php
+            echo $form->field($model, 'nominal_cicilan')->widget(MaskMoney::classname(), [
+                'pluginOptions' => [
+                'prefix' => 'Rp ',
+                'thousands' => '.',
+                'decimal' => ',',
+                'precision' => 0
+                ],
+                'options' => [
+                    'required'=>'required'
+                ]
+            ]);
+            ?>
+
+            <div class="form-group">
+                <?= Html::submitButton('Save', ['class' => 'btn btn-success btn-save']) ?>
+                <a class="btn btn-danger" href="<?= Url::to(Yii::$app->request->referrer);?>">Kembali</a>
+            </div>
+
+            <?php ActiveForm::end(); ?>  
+        </div>
+    </div>
 
 </div>
+
+<?php 
+  
+$this->registerJs("
+
+    $('.btn-save').on('click',function(){
+        var id = $('#cicilan').val();
+        var nominal = $('#pencicilan-nominal_cicilan-disp').val();
+        var nominal_fix  = nominal.replace('Rp ','').replace(/\./g,'');
+        var cicilan = $('#cicilan-bulan').text();
+        var cicilan_fix  = cicilan.replace('Rp ','').replace(/\./g,'');
+        var cicilan_lunas = $('#cicilan-lunas').text();
+        var cicilan_lunas_fix  = cicilan_lunas.replace('Rp ','').replace(/\./g,'');
+        
+        if(id == 1){
+            if(BigInt(cicilan_fix) == BigInt(nominal_fix)){
+                return true;
+            } else {
+                alert('Harus Sesuai Dana Cicilan');
+                $('#pencicilan-nominal_cicilan-disp').focus();
+                return false;
+            }
+        } else {
+            if(BigInt(cicilan_lunas_fix) == BigInt(nominal_fix)){
+                return true;
+            } else {
+                alert('Harus Sesuai Dana Langsung Lunas');
+                $('#pencicilan-nominal_cicilan-disp').focus();
+                return false;
+            }
+        }
+
+    });
+ 
+");
+
+?>

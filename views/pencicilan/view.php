@@ -35,10 +35,13 @@ function to_rp($val)
                         return to_rp($model->nominal_cicilan);
                     }
                     ],
-                    'tanggal_waktu_cicilan',
+                    [
+                        'attribute' => 'tanggal_waktu_cicilan',
+                        'value' => $model->tanggal_waktu_cicilan != null ? $model->tanggal_waktu_cicilan : 'Belum Ada'
+                    ],
                     // 'id_pengguna',
                     [
-                    'attribute' => 'id_jenis_peminjaman',
+                    'attribute' => 'id_jenis_pencicilan',
                     'value' => function($model){
                         if ($model->id_jenis_pencicilan == 1) {
                             return 'Sesuai durasi';

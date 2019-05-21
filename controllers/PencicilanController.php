@@ -63,6 +63,15 @@ class PencicilanController extends Controller
         ]);
     }
 
+    public function actionViewCicilan($id)
+    {
+        $model = Peminjaman::find()->where(['id'=>$id])->one();
+
+        return $this->render('view_cicilan', [
+            'model' => $model
+        ]);
+    }
+
     public function actionCicilan($id)
     {
         $searchModel = new PencicilanSearch();
@@ -141,7 +150,13 @@ class PencicilanController extends Controller
                 $peminjaman->id_status_peminjaman = 2;
                 $peminjaman->save(false);
 
-                $model->id_status_bayar = 2;
+                $dataCicilan = Pencicilan::find()->where(['id_peminjaman'=>$peminjaman->id])->all();
+
+                foreach ($dataCicilan as $key => $value) {
+                    $value->id_status_bayar = 2;
+                    $value->save(false);
+                }
+
                 $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
                 $model->id_jenis_pencicilan = $post['cicilan'];
                 $model->save(false);
@@ -179,14 +194,83 @@ class PencicilanController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        date_default_timezone_set("Asia/Jakarta");
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $model = Pencicilan::find()->where(['id'=>$id])->one();
+        $peminjaman = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
+        $info = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
+        $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$info->id_jenis_peminjaman])->one();
+        $cicilanDenda = Pencicilan::find()->where(['id_peminjaman'=>$model->id_peminjaman])->one();
+        $data = Pencicilan::find()->select('count(id_peminjaman) as total')->groupBy('id_peminjaman')->where(['id_peminjaman'=>$model->id_peminjaman])->andWhere(['id_status_bayar'=>2])->asArray()->all();
+        $cicilan = [];
+        foreach ($data as $key => $value) {
+            $cicilan = (int)$value['total'];
+        }
+        $totalCicilan = json_encode($cicilan);
+
+        if ($peminjaman->id_jenis_peminjaman == 1) {
+            //lunas dipercepat jaminan
+            if ($totalCicilan == '[]') {
+                $intervalDurasi = $peminjaman->durasi - 0;
+            } else {
+                $intervalDurasi = $peminjaman->durasi - $totalCicilan;
+            }
+            $sisaCicilan = ($peminjaman->nominal_peminjaman/$peminjaman->durasi)*$intervalDurasi;
+            $rumus = ($sisaCicilan)+(5/100*$sisaCicilan);
+            $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
+        } else {
+            //lunas dipercepat non-jaminan
+            if ($totalCicilan == '[]') {
+                $intervalDurasi = $peminjaman->durasi - 0;
+            } else {
+                $intervalDurasi = $peminjaman->durasi - $totalCicilan;
+            }
+            $sisaCicilan = ($peminjaman->nominal_pencicilan)*$intervalDurasi;
+            $rumus = ($sisaCicilan)+(5/100*$sisaCicilan);
+            $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
+        }
+
+        if ($model->load(Yii::$app->request->post())) {
+            $post = Yii::$app->request->post();
+
+            if ($post['cicilan'] == 2) {
+                
+                //update status lunas
+                $peminjaman->id_status_peminjaman = 2;
+                $peminjaman->save(false);
+
+                $dataCicilan = Pencicilan::find()->where(['id_peminjaman'=>$peminjaman->id])->all();
+
+                foreach ($dataCicilan as $key => $value) {
+                    $value->id_status_bayar = 2;
+                    $value->save(false);
+                }
+
+                $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
+                $model->id_jenis_pencicilan = $post['cicilan'];
+                $model->save(false);
+
+                Yii::$app->session->setFlash('success', "Update Data Cicilan Nasabah Berhasil");
+                return $this->redirect(['pencicilan/index']);
+            } else {
+                $model->id_status_bayar = 2;
+                $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
+                $model->id_jenis_pencicilan = $post['cicilan'];
+                $model->save(false);
+
+                Yii::$app->session->setFlash('success', "Update Data Cicilan Nasabah Berhasil");
+                return $this->redirect(['pencicilan/cicilan/','id'=>$model->id_peminjaman]);
+            }
         }
 
         return $this->render('update', [
             'model' => $model,
+            'peminjaman' => $peminjaman,
+            'totalCicilan' => $totalCicilan,
+            'info' => $info,
+            'rumus' => $rumus,
+            'denda' => $denda,
+            'cicilanDenda' => $cicilanDenda
         ]);
     }
 

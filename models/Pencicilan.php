@@ -57,7 +57,7 @@ class Pencicilan extends \yii\db\ActiveRecord
             'id' => 'ID',
             'id_peminjaman' => 'Id Peminjaman',
             'id_pengguna' => 'Id Pengguna',
-            'id_jenis_pencicilan' => 'Id Jenis Pencicilan',
+            'id_jenis_pencicilan' => 'Jenis Pencicilan',
             'tanggal_jatuh_tempo' => 'Tanggal Jatuh Tempo',
             'nominal_cicilan' => 'Nominal Cicilan',
             'tanggal_waktu_cicilan' => 'Tanggal Waktu Cicilan',

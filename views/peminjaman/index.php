@@ -61,27 +61,30 @@ function to_rp($val)
                             return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
                         }
                     ],
+                    [
+                    'attribute' => 'id_status_peminjaman',
+                    'format' => 'raw',
+                    'value' => function($model){
+                        if ($model->id_status_peminjaman == 1) {
+                            return '<span class="label label-info">Belum Lunas</span>';
+                        } else {
+                            return '<span class="label label-success">Lunas</span>';
+                        }
+                    }
+                    ],
                     //'id_status_peminjaman',
                     //'id_pengguna',
 
                     [
                         'class' => 'yii\grid\ActionColumn',
-                        'template' => '{view} {update} {delete}',
+                        'template' => '{view} {update}',
                         'buttons' => [
                             'view' => function($url, $model, $key){
                                 return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-eye-open"></span>']),['peminjaman/view','id'=>$model->id], ['class' => 'btn btn-warning modalButtonView']);
                             },
                             'update'=> function($url, $model, $key){
                                 return  Html::a(Yii::t('app', ' {modelClass}', ['modelClass' => '<span class="glyphicon glyphicon-pencil"></span>']), ['peminjaman/update','id'=>$model->id], ['class' => 'btn btn-info modalButtonUpdate']);
-                            },
-                            'delete'=> function($url, $model, $key){
-                                return  Html::a(Yii::t('app', ' {modelClass}', ['modelClass' => '<span class="glyphicon glyphicon-trash"></span>']), ['peminjaman/delete','id'=>$model->id], ['class' => 'btn btn-danger',
-                                    'data' => [
-                                        'confirm' => 'Apakah anda yakin untuk menghapus data ini ?',
-                                        'method' => 'post',
-                                    ],
-                                ]);
-                            },
+                            }
                         ],
                     ],
                 ],
