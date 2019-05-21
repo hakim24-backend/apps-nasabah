@@ -48,6 +48,17 @@ function to_rp($val)
                     //'jaminan',
                     // 'tanggal_waktu_pembuatan',
                     [
+                    'attribute' => 'id_status_peminjaman',
+                    'format' => 'raw',
+                    'value' => function($model){
+                        if ($model->id_status_peminjaman == 1) {
+                            return '<span class="label label-info">Belum Lunas</span>';
+                        } else {
+                            return '<span class="label label-success">Lunas</span>';
+                        }
+                    }
+                    ],
+                    [
                         'attribute' => 'foto_ktp',
                         'format' => 'html',
                         'value'=>function($data){
@@ -60,17 +71,6 @@ function to_rp($val)
                         'value'=>function($data){
                             return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
                         }
-                    ],
-                    [
-                    'attribute' => 'id_status_peminjaman',
-                    'format' => 'raw',
-                    'value' => function($model){
-                        if ($model->id_status_peminjaman == 1) {
-                            return '<span class="label label-info">Belum Lunas</span>';
-                        } else {
-                            return '<span class="label label-success">Lunas</span>';
-                        }
-                    }
                     ],
                     //'id_status_peminjaman',
                     //'id_pengguna',

@@ -37,20 +37,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     // 'tempat_lahir',
                     // 'tanggal_lahir',
                     // 'jenis_kelamin',
-                    // [
-                    //     'attribute' => 'id_akun',
-                    //     'format' => 'raw',
-                    //     'value'=>function($model){
-                    //         $data = Peminjaman::find()->where(['id_nasabah'=>$model['id']])->one();
-                    //         if ($data['id_jenis_peminjaman'] == 1) {
-                    //             return 'Jaminan';
-                    //         } elseif ($data['id_jenis_peminjaman'] == 2) {
-                    //             return 'Non-jaminan';
-                    //         } else {
-                    //             return 'Belum melakukan pinjaman';
-                    //         }
-                    //     }
-                    // ],
+                    [
+                        'attribute' => 'id_akun',
+                        'format' => 'raw',
+                        'value'=>function($model){
+                            if ($model->akun->id_status_akun == 1) {
+                                return '<span class="label label-success">Aktif</span>';
+                            } else {
+                                return '<span class="label label-danger">Tidak Aktif</span>';
+                            }
+                        }
+                    ],
                     // 'email:email',
                     [
                         'attribute' => 'foto_ktp',

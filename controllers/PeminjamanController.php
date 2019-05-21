@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Peminjaman;
+use app\models\Akun;
 use app\models\Pencicilan;
 use app\models\PeminjamanJenis;
 use app\models\Nasabah;
@@ -73,8 +74,15 @@ class PeminjamanController extends Controller
         date_default_timezone_set("Asia/Jakarta");
         $model = new Peminjaman();
 
+        //join nasabah with akun
+        $data = Nasabah::find()
+        ->leftJoin('Akun', 'Akun.id = Nasabah.id_akun')
+        ->where(['Akun.id_status_akun'=>1])
+        ->asArray()
+        ->all();
+
         //data nasabah
-        $nama = ArrayHelper::map(Nasabah::find()->all(), 'id', 'nama');
+        $nama = ArrayHelper::map($data, 'id', 'nama');
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
@@ -156,7 +164,7 @@ class PeminjamanController extends Controller
                         $cicilan->id_jenis_pencicilan = 1;
                         $cicilan->periode = ($i + 1);
                         $cicilan->id_status_bayar = 1;
-                        $cicilan->tanggal_jatuh_tempo = Peminjaman::getDueDate($model->tanggal_waktu_pembuatan, $i);
+                        $cicilan->tanggal_jatuh_tempo = Peminjaman::getDueDate($model->id_jenis_durasi, $model->tanggal_waktu_pembuatan, $i);
                         $cicilan->save(false);   
                     }
 
@@ -186,20 +194,20 @@ class PeminjamanController extends Controller
         if ($id == 1) {
 
             //create nomor kontrak
-            $kode = 'J/';
-            $list = Peminjaman::find()->where(['LIKE','nomor_kontrak',$kode])->orderBy(['nomor_kontrak'=> SORT_DESC])->limit(1)->one();
-            if ($list == null) {
-                $counter = '001';
+            $data = Peminjaman::find()->where(['id_jenis_peminjaman'=>1])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+
+            if ($data == null) {
+                $digitFront = '0001';
                 $month = date('m');
                 $year = date('Y');
             } else {
-                $counter = explode('/',$list['nomor_kontrak'])[1];
-                $counter = str_pad(intval($counter+1), 3, '0', STR_PAD_LEFT);
+                $digitFront = explode('/',$data['nomor_kontrak'])[0];
+                $digitFront = str_pad(intval($digitFront+1), 4, '0', STR_PAD_LEFT);
                 $month = date('m');
                 $year = date('Y');
             }
-            
-            $code = $kode.''.$counter.'/'.$month.'/'.$year;
+
+            $code = $digitFront.'/'.$month.'/'.$year;
 
             echo '
                 <label>Nomor Kontrak</label>
@@ -238,20 +246,14 @@ class PeminjamanController extends Controller
         if ($id_durasi == 1) {
             
             //create nomor kontrak mingguan
-            $kode = 'M/';
-            $list = Peminjaman::find()->where(['LIKE','nomor_kontrak',$kode])->orderBy(['nomor_kontrak'=> SORT_DESC])->limit(1)->one();
-            if ($list == null) {
-                $counter = '001';
-                $month = date('m');
-                $year = date('Y');
+            $data = Peminjaman::find()->where(['id_jenis_peminjaman'=>2])->andWhere(['id_jenis_durasi'=>1])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+
+            if ($data == null) {
+                $code = '00001';
             } else {
-                $counter = explode('/',$list['nomor_kontrak'])[1];
-                $counter = str_pad(intval($counter+1), 3, '0', STR_PAD_LEFT);
-                $month = date('m');
-                $year = date('Y');
+                $code = $data['nomor_kontrak'];
+                $code = str_pad(intval($code+1), 5, '0', STR_PAD_LEFT);
             }
-            
-            $code = $kode.''.$counter.'/'.$month.'/'.$year;
 
             echo '
                 <label>Nomor Kontrak</label>
@@ -261,20 +263,14 @@ class PeminjamanController extends Controller
         } elseif ($id_durasi == 2) {
             
             //create nomor kontrak bulanan
-            $kode = 'B/';
-            $list = Peminjaman::find()->where(['LIKE','nomor_kontrak',$kode])->orderBy(['nomor_kontrak'=> SORT_DESC])->limit(1)->one();
-            if ($list == null) {
-                $counter = '01';
-                $month = date('m');
-                $year = date('Y');
+            $data = Peminjaman::find()->where(['id_jenis_peminjaman'=>2])->andWhere(['id_jenis_durasi'=>2])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+
+            if ($data == null) {
+                $code = '0001';
             } else {
-                $counter = explode('/',$list['nomor_kontrak'])[1];
-                $counter = str_pad(intval($counter+1), 2, '0', STR_PAD_LEFT);
-                $month = date('m');
-                $year = date('Y');
+                $code = $data['nomor_kontrak'];
+                $code = str_pad(intval($code+1), 4, '0', STR_PAD_LEFT);
             }
-            
-            $code = $kode.''.$counter.'/'.$month.'/'.$year;
 
             echo '
                 <label>Nomor Kontrak</label>

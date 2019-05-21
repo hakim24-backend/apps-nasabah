@@ -33,10 +33,17 @@ function to_rp($val)
             <div id="cicilan-lunas" style="display:inline"> 
                 <?= to_rp($rumus) ?>
             </div><br>
-            Cicilan per bulan = 
-            <div id="cicilan-bulan" style="display:inline"> 
-                <?=to_rp($info->nominal_pencicilan)?>
-            </div><br>
+            <?php if ($info->id_jenis_durasi == 1) { ?>
+                Cicilan per minggu = 
+                <div id="cicilan-bulan" style="display:inline"> 
+                    <?=to_rp($info->nominal_pencicilan)?>
+                </div><br>
+            <?php } else { ?>
+                Cicilan per bulan = 
+                <div id="cicilan-bulan" style="display:inline"> 
+                    <?=to_rp($info->nominal_pencicilan)?>
+                </div><br>
+            <?php } ?>
             Tanggal Jatuh Tempo = <?=date("d/m/Y", strtotime($cicilanDenda->tanggal_jatuh_tempo))?><br>
             <!-- Jatuh Tempo = <?=date("d/m/Y", strtotime($info->tanggal_waktu_pembuatan."+1 months"))?><br> -->
             <?php if ($totalCicilan == '[]' ) { ?>
@@ -98,26 +105,30 @@ $this->registerJs("
 
     $('.btn-save').on('click',function(){
         var id = $('#cicilan').val();
+        var denda = $('#denda').text();
+        var denda_fix = denda.replace('Rp ','').replace(/\./g,'');
         var nominal = $('#pencicilan-nominal_cicilan-disp').val();
         var nominal_fix  = nominal.replace('Rp ','').replace(/\./g,'');
         var cicilan = $('#cicilan-bulan').text();
         var cicilan_fix  = cicilan.replace('Rp ','').replace(/\./g,'');
         var cicilan_lunas = $('#cicilan-lunas').text();
         var cicilan_lunas_fix  = cicilan_lunas.replace('Rp ','').replace(/\./g,'');
+        var cicilan_denda = BigInt(cicilan_fix)+BigInt(denda_fix);
+        var cicilan_lunas_denda = BigInt(cicilan_lunas_fix)+BigInt(denda_fix);
         
         if(id == 1){
-            if(BigInt(cicilan_fix) == BigInt(nominal_fix)){
+            if(BigInt(cicilan_denda) == BigInt(nominal_fix)){
                 return true;
             } else {
-                alert('Harus Sesuai Dana Cicilan');
+                alert('Harus Sesuai Dana Cicilan + Denda');
                 $('#pencicilan-nominal_cicilan-disp').focus();
                 return false;
             }
         } else {
-            if(BigInt(cicilan_lunas_fix) == BigInt(nominal_fix)){
+            if(BigInt(cicilan_lunas_denda) == BigInt(nominal_fix)){
                 return true;
             } else {
-                alert('Harus Sesuai Dana Langsung Lunas');
+                alert('Harus Sesuai Dana Langsung Lunas + Denda');
                 $('#pencicilan-nominal_cicilan-disp').focus();
                 return false;
             }

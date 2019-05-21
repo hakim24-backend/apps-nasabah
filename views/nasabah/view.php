@@ -15,7 +15,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="nasabah-view">
 
     <p>
-        <a class="btn btn-danger" href="<?php echo Url::to(['nasabah/index']) ?>">Kembali</a>
+        <a class="btn btn-warning" href="<?php echo Url::to(['nasabah/index']) ?>">Kembali</a>
+        <?php if ($akun->id_status_akun == 2) { ?>
+            <?= Html::a('Aktifkan Akun', ['aktif-akun', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?php } else { ?>
+            <?= Html::a('Non-Aktifkan Akun', ['non-aktif-akun', 'id' => $model->id], ['class' => 'btn btn-danger']) ?>
+        <?php } ?>
     </p>
 
     <div class="box box-info">

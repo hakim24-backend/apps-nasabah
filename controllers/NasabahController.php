@@ -65,8 +65,12 @@ class NasabahController extends Controller
 
     public function actionView($id)
     {
+        $model = Nasabah::find()->where(['id'=>$id])->one();
+        $akun = Akun::find()->where(['id'=>$model->id_akun])->one();
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'akun' => $akun
         ]);
     }
 
@@ -94,6 +98,34 @@ class NasabahController extends Controller
         return $this->render('monitor', [
             'model' => $model,
         ]);
+    }
+
+    public function actionAktifAkun($id)
+    {
+        $model = Nasabah::find()->where(['id'=>$id])->one();
+        $akun = Akun::find()->where(['id'=>$model->id_akun])->one();
+        $akun->id_status_akun = 1;
+        $akun->save(false);
+
+        $email = \Yii::$app->mailer->compose('active')
+                                    ->setTo($model->email)
+                                    ->setFrom(['mamorasoft.firebase@gmail.com'])
+                                    ->setSubject('Activation Account')
+                                    ->send();
+
+        Yii::$app->session->setFlash('success', "Aktifkan Akun Nasabah Berhasil");
+        return $this->redirect(['nasabah/index']);
+    }
+
+    public function actionNonAktifAkun($id)
+    {
+        $model = Nasabah::find()->where(['id'=>$id])->one();
+        $akun = Akun::find()->where(['id'=>$model->id_akun])->one();
+        $akun->id_status_akun = 2;
+        $akun->save(false);
+
+        Yii::$app->session->setFlash('success', "Non-Aktifkan Akun Nasabah Berhasil");
+        return $this->redirect(['nasabah/index']);
     }
 
     /**

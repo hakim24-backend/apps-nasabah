@@ -62,7 +62,7 @@ class Nasabah extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'id_akun' => 'Id Akun',
+            'id_akun' => 'Status Akun',
             'nama' => 'Nama',
             'alamat' => 'Alamat',
             'tempat_lahir' => 'Tempat Lahir',

@@ -111,7 +111,7 @@ class PencicilanController extends Controller
         $peminjaman = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
         $info = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
         $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$info->id_jenis_peminjaman])->one();
-        $cicilanDenda = Pencicilan::find()->where(['id_peminjaman'=>$model->id_peminjaman])->one();
+        $cicilanDenda = Pencicilan::find()->where(['id'=>$id])->one();
         $data = Pencicilan::find()->select('count(id_peminjaman) as total')->groupBy('id_peminjaman')->where(['id_peminjaman'=>$model->id_peminjaman])->andWhere(['id_status_bayar'=>2])->asArray()->all();
         $cicilan = [];
         foreach ($data as $key => $value) {
@@ -159,6 +159,7 @@ class PencicilanController extends Controller
 
                 $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
                 $model->id_jenis_pencicilan = $post['cicilan'];
+                $model->nominal_denda_dibayar = $denda;
                 $model->save(false);
 
                 Yii::$app->session->setFlash('success', "Tambah Data Cicilan Nasabah Berhasil");
@@ -167,7 +168,17 @@ class PencicilanController extends Controller
                 $model->id_status_bayar = 2;
                 $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
                 $model->id_jenis_pencicilan = $post['cicilan'];
+                $model->nominal_denda_dibayar = $denda;
                 $model->save(false);
+
+                $dataLunas = Pencicilan::find()->where(['id_peminjaman'=>$peminjaman->id])->all();
+
+                // foreach ($dataLunas as $value) {
+                //     $data = Pencicilan::find()->where(['id_status_bayar'=>2])->all();
+                //     var_dump($data);
+                // }
+
+                // die();
 
                 Yii::$app->session->setFlash('success', "Tambah Data Cicilan Nasabah Berhasil");
                 return $this->redirect(['pencicilan/cicilan/','id'=>$model->id_peminjaman]);
@@ -200,7 +211,7 @@ class PencicilanController extends Controller
         $peminjaman = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
         $info = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
         $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$info->id_jenis_peminjaman])->one();
-        $cicilanDenda = Pencicilan::find()->where(['id_peminjaman'=>$model->id_peminjaman])->one();
+        $cicilanDenda = Pencicilan::find()->where(['id'=>$id])->one();
         $data = Pencicilan::find()->select('count(id_peminjaman) as total')->groupBy('id_peminjaman')->where(['id_peminjaman'=>$model->id_peminjaman])->andWhere(['id_status_bayar'=>2])->asArray()->all();
         $cicilan = [];
         foreach ($data as $key => $value) {
@@ -233,6 +244,9 @@ class PencicilanController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
 
+             $dataLunas = Pencicilan::find()->where(['id_peminjaman'=>$peminjaman->id])->all();
+            // var_dump($dataLunas);die();
+
             if ($post['cicilan'] == 2) {
                 
                 //update status lunas
@@ -248,6 +262,7 @@ class PencicilanController extends Controller
 
                 $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
                 $model->id_jenis_pencicilan = $post['cicilan'];
+                $model->nominal_denda_dibayar = $denda;
                 $model->save(false);
 
                 Yii::$app->session->setFlash('success', "Update Data Cicilan Nasabah Berhasil");
@@ -256,6 +271,7 @@ class PencicilanController extends Controller
                 $model->id_status_bayar = 2;
                 $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
                 $model->id_jenis_pencicilan = $post['cicilan'];
+                $model->nominal_denda_dibayar = $denda;
                 $model->save(false);
 
                 Yii::$app->session->setFlash('success', "Update Data Cicilan Nasabah Berhasil");
