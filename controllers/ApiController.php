@@ -322,9 +322,17 @@ class ApiController extends \yii\rest\Controller
 
     			foreach ($bills as $key => $value) {
 					//denda
-					$peminjaman_jenis = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->asArray()->one();
-        			// $value['nominal_denda'] = Peminjaman::getDenda($credit['id_jenis_durasi'], $value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
-        			$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
+					if($value['id_status_bayar'] == 1) {
+						$peminjaman_jenis = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->asArray()->one();
+	        			// $value['nominal_denda'] = Peminjaman::getDenda($credit['id_jenis_durasi'], $value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
+	        			$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
+	        		} else {
+	        			if($value['id_jenis_pencicilan'] == 1){
+		        			$value['nominal_denda'] = $value['nominal_cicilan'] - $credit['nominal_pencicilan'];
+		        		} else {
+		        			$value['nominal_denda'] = 0;
+		        		}
+	        		}
 
     				//nama_pelayan
         			$pengguna = Pengguna::find()->where(['id'=>$value['id_pengguna']])->one();
