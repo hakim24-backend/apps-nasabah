@@ -216,7 +216,7 @@ class ApiController extends \yii\rest\Controller
                 	$nasabah->save(false);
 
                 	$transaction->commit();
-                	$response['message'] = 'Berhasil mendaftar';
+                	$response['message'] = 'Berhasil mengirim lokasi';
             		$response['status'] = 1;
                 } catch (\Exception $e) {
                     $transaction->rollBack();
@@ -323,7 +323,7 @@ class ApiController extends \yii\rest\Controller
     			foreach ($bills as $key => $value) {
 					//denda
 					$peminjaman_jenis = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->asArray()->one();
-        			$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
+        			$value['nominal_denda'] = Peminjaman::getDenda($credit['id_jenis_durasi'], $value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
 
     				//nama_pelayan
         			$pengguna = Pengguna::find()->where(['id'=>$value['id_pengguna']])->one();

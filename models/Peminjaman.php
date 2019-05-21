@@ -143,13 +143,17 @@ class Peminjaman extends \yii\db\ActiveRecord
         }
     }
 
-    public function getDenda($due_date, $payment_amount, $late_penalty_percent){
+    public function getDenda($credit_duration_type, $due_date, $payment_amount, $late_penalty_percent){
 
         $late_day = (strtotime(date("Y-m-d")) - strtotime($due_date)) / (60 * 60 * 24);
         if ($late_day < 1){
             $late_day = 0;
         }
         
-        return $late_day * $payment_amount * $late_penalty_percent / 100 / 30;
+        if($credit_duration_type == 1){
+            return $late_day * $payment_amount * $late_penalty_percent / 100 / 7;
+        } else {
+            return $late_day * $payment_amount * $late_penalty_percent / 100 / 30;
+        }
     }
 }
