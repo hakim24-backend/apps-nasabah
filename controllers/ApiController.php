@@ -11,6 +11,8 @@ use app\models\PeminjamanJenis;
 use app\models\PeminjamanStatus;
 use app\models\Pengguna;
 use app\models\Pencicilan;
+use app\models\PencicilanJenis;
+use app\models\PencicilanStatusBayar;
 use Yii;
 
 class ApiController extends \yii\rest\Controller
@@ -81,12 +83,26 @@ class ApiController extends \yii\rest\Controller
 	                        move_uploaded_file($param['with_ktp']['tmp_name'], $filedest);
 	                        $nasabah->foto_bersama_ktp = $name;
 
-	                        $nasabah->save(false);
+	                        if($nasabah->save(false)){
 
-	                        $response['message'] = "Registrasi berhasil";
-	                        $response['status'] = 1;
-	                        $response['customer_id'] = $nasabah->id;
-	                        $transaction->commit();
+								$email = \Yii::$app->mailer->compose('index')
+	                                ->setTo($nasabah->email)
+	                                ->setFrom(['mamorasoft.firebase@gmail.com'])
+	                                ->setSubject('Signup Confirmation')
+	                                ->send();
+
+	                            if ($email){
+	                            	$response['message'] = "Registrasi berhasil";
+			                        $response['status'] = 1;
+			                        $response['customer_id'] = $nasabah->id;
+		                        	$transaction->commit();
+		                    	} else {
+		                    		$transaction->rollBack();
+				                    $response['message'] = "Gagal mengirim email konfirmasi";
+				                    $response['status'] = 0;
+		                    	}
+		                    }
+                           
 	                    }
 	                }
 
@@ -222,33 +238,13 @@ class ApiController extends \yii\rest\Controller
 	        			$value['pengguna'] = $pengguna['nama'];
 
 	        			if($value['id_status_peminjaman'] == 2){
-							//sisa_pencicilan
-	        				$value['payment_count_left'] = 0;
-
-	        				//due_date
-	        				$value['tanggal_jatuh_tempo'] = "-";
-
-	        				//denda
-	        				$value['denda'] = 0;
-
-	        				//nominal_langsung_lunas
-	        				$value['nominal_langsung_lunas'] = 0;
+							//sisa_kali_pencicilan
+	        				$value['sisa_kali_pembayaran'] = 0;
 	        			} else {
 							//sisa_kali_pencicilan
-							$paid_count = Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->count();
+							$paid_count = Pencicilan::find()->where(['id_peminjaman'=>$value['id']])->andWhere(['id_status_bayar'=>2])->count();
 	        				$difference = $value['durasi'] - $paid_count;
 	        				$value['sisa_kali_pembayaran'] = $difference;
-
-	        				//due_date
-	        				$date=date_create(Peminjaman::getDueDate($value['tanggal_waktu_pembuatan'], $paid_count));
-	        				$value['tanggal_jatuh_tempo'] = date_format($date, 'd F Y');
-
-	        				//denda
-	        				$value['denda'] = Peminjaman::getDenda($value['tanggal_waktu_pembuatan'], $paid_count, $value['nominal_pencicilan'], $jenis_peminjaman->besar_denda);
-
-	        				//nominal_langsung_lunas
-	        				
-	        				$value['nominal_langsung_lunas'] = 0;
 	        			}
 
 	        			$credit[$key] = $value;
@@ -284,67 +280,91 @@ class ApiController extends \yii\rest\Controller
 
         	if ($credit) {
 
-    			//tanggal_peminjaman
-    			$date=date_create($credit['tanggal_waktu_pembuatan']);
-    			$credit['tanggal_waktu_pembuatan'] = date_format($date, 'd F Y');
+        		$last_amount = 0;
+        		$amount_left = 0;
+        		$get_late_penalty = 0;
+        		$current_period = 0;
+    			$bills = Pencicilan::find()->where(['id_peminjaman'=>$credit['id']])->orderBy(['periode'=>SORT_ASC])->asArray()->all();
 
-    			//jenis_peminjaman
-    			$jenis_peminjaman = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->one();
-    			$credit['jenis_peminjaman'] = $jenis_peminjaman->jenis_peminjaman;
+    			foreach ($bills as $key => $value) {
+					//denda
+					$peminjaman_jenis = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->asArray()->one();
+        			$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
 
-    			//jenis_durasi_peminjaman
-    			$jenis_durasi = PeminjamanDurasiJenis::find()->where(['id'=>$credit['id_jenis_durasi']])->one();
-    			$credit['jenis_durasi'] = $jenis_durasi->durasi_peminjaman;
+    				//nama_pelayan
+        			$pengguna = Pengguna::find()->where(['id'=>$value['id_pengguna']])->one();
+        			$value['pengguna'] = $pengguna['nama'];
 
-    			//status_peminjaman
-    			$status_peminjaman = PeminjamanStatus::find()->where(['id'=>$credit['id_status_peminjaman']])->one();
-    			$credit['status_peminjaman'] = $status_peminjaman->status_peminjaman;
+        			//status_bayar
+        			$status_bayar = PencicilanStatusBayar::find()->where(['id'=>$value['id_status_bayar']])->one();
+        			$value['status_bayar'] = $status_bayar['status_bayar'];
 
-    			//nama_pelayan
-    			$pengguna = Pengguna::find()->where(['id'=>$credit['id_pengguna']])->one();
-    			$credit['pengguna'] = $pengguna['nama'];
+        			//jenis_pencicilan
+        			$jenis_pencicilan = PencicilanJenis::find()->where(['id'=>$value['id_jenis_pencicilan']])->one();
+        			$value['jenis_pencicilan'] = $jenis_pencicilan['jenis_pencicilan'];
 
-    			$pencicilan = Pencicilan::find()->where(['id_peminjaman'=>$credit['id']])->asArray()->all();
+        			//tanggal_peminjaman
+        			$date_due=date_create($value['tanggal_jatuh_tempo']);
+        			$value['tanggal_jatuh_tempo'] = date_format($date_due, 'd F Y');
 
-    			for($i = 0; $i < ($credit['durasi'] - count($pencicilan)); $i++){
-    				$temp = array();
+        			//tanggal_waktu_cicilan
+        			if ($value['tanggal_waktu_cicilan']){
+        				$date_payment=date_create($value['tanggal_waktu_cicilan']);
+        				$value['tanggal_waktu_cicilan'] = date_format($date_payment, 'd F Y');
+        			}
 
-    				// $temp['']
+        			$bills[$key] = $value;
 
-    				// $credit['bill'][$i] = 
+        			//pre_pelunasan_calculation
+        			if($credit['id_status_peminjaman'] == 1){
+        				if($credit['id_jenis_peminjaman'] == 1){
+		        			if($current_period == 0){
+		        				if($value['id_status_bayar'] == 1){
+		        					$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
+		        				}
+		        				if(strtotime(date("Y-m-d")) < strtotime($value['tanggal_jatuh_tempo'])){
+		        					$current_period = 1;
+			        			}
+			        		} else {
+			        			$amount_left += ($credit['nominal_peminjaman'] / $credit['durasi']);
+			        		}
+			        	} 
+			        	else {
+			        		if($current_period == 0){
+		        				if($value['id_status_bayar'] == 1){
+		        					$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
+		        					if($value['nominal_denda'] > 0){
+		        						$get_late_penalty = 1;
+		        					}
+		        				} else {
+		        					if($value['nominal_cicilan'] > $credit['nominal_pencicilan']){
+		        						$get_late_penalty = 1;
+		        					}
+		        				}
+		        				if(strtotime(date("Y-m-d")) < strtotime($value['tanggal_jatuh_tempo'])){
+		        					$current_period = 1;
+			        			}
+			        		} else {
+			        			$amount_left += $credit['nominal_pencicilan'];
+			        		}
+			        	}
+		        	}
     			}
 
-    			if($credit['id_status_peminjaman'] == 2){
-					//sisa_pencicilan
-    				$credit['payment_count_left'] = 0;
-
-    				//due_date
-    				$credit['tanggal_jatuh_tempo'] = "-";
-
-    				//denda
-    				$credit['denda'] = 0;
-
-    				//nominal_langsung_lunas
-    				$credit['nominal_langsung_lunas'] = 0;
-    			} else {
-					//sisa_kali_pencicilan
-					$paid_count = Pencicilan::find()->where(['id_peminjaman'=>$credit['id']])->count();
-    				$difference = $credit['durasi'] - $paid_count;
-    				$credit['sisa_kali_pembayaran'] = $difference;
-
-    				//due_date
-    				$date=date_create(Peminjaman::getDueDate($credit['tanggal_waktu_pembuatan'], $paid_count));
-    				$credit['tanggal_jatuh_tempo'] = date_format($date, 'd F Y');
-
-    				//denda
-    				$credit['denda'] = Peminjaman::getDenda($credit['tanggal_waktu_pembuatan'], $paid_count, $credit['nominal_pencicilan'], $jenis_peminjaman->besar_denda);
-
-    				//nominal_langsung_lunas
-
-    				$credit['nominal_langsung_lunas'] = 0;
-    			}
-
-        		$response['credit'] = $credit;
+    			//final_pelunasan_calculation
+    			if($credit['id_status_peminjaman'] == 1){
+	    			if($credit['id_jenis_peminjaman'] == 1){
+		    			$response['direct_payment_amount'] = $last_amount + $amount_left + $amount_left * $peminjaman_jenis['besar_pinalti_langsung_lunas'];
+		    		} else {
+		    			$response['direct_payment_amount'] = $last_amount + $amount_left;
+		    			if ($get_late_penalty == 0){
+			    			$response['direct_payment_amount'] -= $credit['nominal_tabungan_ditahan'];
+			    		}
+		    		}
+		    	} else {
+		    		$response['direct_payment_amount'] = 0;
+		    	}
+        		$response['bill'] = $bills;
 	        	$response['message'] = 'Berhasil mengambil data';
 	            $response['status'] = 1;
 	        } else {
