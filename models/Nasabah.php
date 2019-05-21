@@ -20,7 +20,7 @@ use Yii;
  * @property string $foto_bersama_ktp
  * @property double $latitude
  * @property double $longitude
- * @property string $access_token
+ * @property string $tanggal_waktu_posisi
  *
  * @property Akun $akun
  * @property NasabahBukuTelepon[] $nasabahBukuTelepons
@@ -42,6 +42,7 @@ class Nasabah extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['tanggal_waktu_posisi'], 'safe'],
             [['id_akun'], 'integer'],
             [['tanggal_lahir'], 'safe'],
             [['latitude', 'longitude'], 'number'],
@@ -73,6 +74,7 @@ class Nasabah extends \yii\db\ActiveRecord
             'foto_bersama_ktp' => 'Foto Bersama Ktp',
             'latitude' => 'Latitude',
             'longitude' => 'Longitude',
+            'tanggal_waktu_posisi' => 'Tanggal Waktu Posisi',
             'access_token' => 'Access Token',
         ];
     }

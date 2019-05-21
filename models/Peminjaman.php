@@ -135,8 +135,12 @@ class Peminjaman extends \yii\db\ActiveRecord
         return $this->hasMany(Pencicilan::className(), ['id_peminjaman' => 'id']);
     }
 
-    public function getDueDate($create_date, $paid_count){
-        return date("Y-m-d",strtotime(date("Y-m-d", strtotime($create_date)) . " +" . ($paid_count + 1) . " month"));
+    public function getDueDate($credit_duration_type, $create_date, $paid_count){
+        if($credit_duration_type == 1){
+            return date("Y-m-d",strtotime(date("Y-m-d", strtotime($create_date)) . " +" . ($paid_count + 1) . " week"));
+        } else {
+            return date("Y-m-d",strtotime(date("Y-m-d", strtotime($create_date)) . " +" . ($paid_count + 1) . " month"));
+        }
     }
 
     public function getDenda($due_date, $payment_amount, $late_penalty_percent){

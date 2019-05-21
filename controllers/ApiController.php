@@ -71,18 +71,6 @@ class ApiController extends \yii\rest\Controller
 
 	                    if($nasabah->save(false)){
 
-	                    	$extension = $this->getFileExtension($param['ktp']['name']);
-	                        $name = "ktp-".$nasabah->id."-".time(). '.' . $extension;
-	                        $filedest = 'foto/' . $name;
-	                        move_uploaded_file($param['ktp']['tmp_name'], $filedest);
-	                        $nasabah->foto_ktp = $name;
-
-	                        $extension = $this->getFileExtension($param['with_ktp']['name']);
-	                        $name = "with_ktp-".$nasabah->id."-".time(). '.' . $extension;
-	                        $filedest = 'foto/' . $name;
-	                        move_uploaded_file($param['with_ktp']['tmp_name'], $filedest);
-	                        $nasabah->foto_bersama_ktp = $name;
-
 	                        if($nasabah->save(false)){
 
 								$email = \Yii::$app->mailer->compose('index')
@@ -92,6 +80,18 @@ class ApiController extends \yii\rest\Controller
 	                                ->send();
 
 	                            if ($email){
+	                            	$extension = $this->getFileExtension($param['ktp']['name']);
+			                        $name = "ktp-".$nasabah->id."-".time(). '.' . $extension;
+			                        $filedest = 'foto/' . $name;
+			                        move_uploaded_file($param['ktp']['tmp_name'], $filedest);
+			                        $nasabah->foto_ktp = $name;
+
+			                        $extension = $this->getFileExtension($param['with_ktp']['name']);
+			                        $name = "with_ktp-".$nasabah->id."-".time(). '.' . $extension;
+			                        $filedest = 'foto/' . $name;
+			                        move_uploaded_file($param['with_ktp']['tmp_name'], $filedest);
+			                        $nasabah->foto_bersama_ktp = $name;
+
 	                            	$response['message'] = "Registrasi berhasil";
 			                        $response['status'] = 1;
 			                        $response['customer_id'] = $nasabah->id;
@@ -180,6 +180,40 @@ class ApiController extends \yii\rest\Controller
 
                 		$phone_number->save(false);
                 	}
+
+                	$transaction->commit();
+                	$response['message'] = 'Berhasil mendaftar';
+            		$response['status'] = 1;
+                } catch (\Exception $e) {
+                    $transaction->rollBack();
+                    $response['message'] = $e->getMessage();
+                    $response['status'] = 0;
+                }
+        	} else {
+        		$response['message'] = 'Data tidak boleh kosong';
+            	$response['status'] = 0;
+        	}
+        } else {
+        	$response['message'] = 'Data tidak boleh kosong';
+            $response['status'] = 0;
+        }
+
+        return $response; 
+    }
+
+    public function actionSendLocation(){
+        $request = Yii::$app->request->post();
+        $response = array();
+
+        if (isset($request)) {
+        	if ($request['customer_id'] != "" && $request['latitude'] != "" && $request['longitude'] != "") {
+        		$transaction = Yii::$app->db->beginTransaction();
+                try{
+                	$nasabah = Nasabah::find()->where(['id'=>$request['customer_id']])->one();
+                	$nasabah->latitude = $request['latitude'];
+                	$nasabah->longitude = $request['longitude'];
+                	$nasabah->tanggal_waktu_posisi = date('Y-m-d H:i:s');
+                	$nasabah->save(false);
 
                 	$transaction->commit();
                 	$response['message'] = 'Berhasil mendaftar';

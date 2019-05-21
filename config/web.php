@@ -30,7 +30,7 @@ $config = [
             'class' => 'yii\swiftmailer\Mailer',
             'transport'=>[
                 'class'=>'Swift_SmtpTransport',
-                'host'=>'localhost',
+                'host'=>'smtp.gmail.com',
                 'username'=>'mamorasoft.firebase@gmail.com',
                 'password'=>'mamorahmat2019',
                 'port'=>'465',
@@ -43,7 +43,7 @@ $config = [
                     ],
                 ]
             ],
-            'viewPath'=>'@common/mail',
+            'viewPath'=>'../mail',
             'useFileTransport' => false,
         ],
         'log' => [
