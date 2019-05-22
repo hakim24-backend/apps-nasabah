@@ -110,7 +110,7 @@ class NasabahController extends Controller
         $email = \Yii::$app->mailer->compose('active')
                                     ->setTo($model->email)
                                     ->setFrom(['mamorasoft.firebase@gmail.com'])
-                                    ->setSubject('Activation Account')
+                                    ->setSubject('Akun Telah Aktif')
                                     ->send();
 
         Yii::$app->session->setFlash('success', "Aktifkan Akun Nasabah Berhasil");
