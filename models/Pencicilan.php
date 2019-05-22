@@ -100,4 +100,40 @@ class Pencicilan extends \yii\db\ActiveRecord
     {
         return $this->hasOne(PencicilanStatusBayar::className(), ['id' => 'id_status_bayar']);
     }
+
+    public function getTotalCicilan($id_peminjaman)
+    {
+        $data = Pencicilan::find()->select('count(id_peminjaman) as total')->groupBy('id_peminjaman')->where(['id_peminjaman'=>$id_peminjaman])->andWhere(['id_status_bayar'=>2])->asArray()->all();
+        $cicilan = [];
+        foreach ($data as $key => $value) {
+            $cicilan = (int)$value['total'];
+        }
+
+        return json_encode($cicilan);
+    }
+
+    public function getLunasDipercepat($id_jenis_peminjaman,$totalCicilan,$durasi,$nominal_peminjaman)
+    {
+        if ($id_jenis_peminjaman == 1) {
+            //lunas dipercepat jaminan
+            if ($totalCicilan == '[]') {
+                $intervalDurasi = $durasi - 0;
+            } else {
+                $intervalDurasi = $durasi - $totalCicilan;
+            }
+            $sisaCicilan = ($nominal_peminjaman/$durasi)*$intervalDurasi;
+
+            return ($sisaCicilan)+(5/100*$sisaCicilan);
+
+        } else {
+            //lunas dipercepat non-jaminan
+            if ($totalCicilan == '[]') {
+                $intervalDurasi = $durasi - 0;
+            } else {
+                $intervalDurasi = $durasi - $totalCicilan;
+            }
+
+            return ($nominal_peminjaman/$durasi)*$intervalDurasi;
+        }
+    }
 }
