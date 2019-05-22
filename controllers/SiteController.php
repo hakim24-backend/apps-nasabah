@@ -128,4 +128,20 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+
+    public function actionConfirm($access_token)
+    {
+        $account = Akun::find()->where(['access_token'=>$access_token])->one();
+        if ($account) {
+            # code...
+            $account->id_status_akun = 2;
+            $account->access_token = Yii::$app->security->generateRandomString();
+            $account->save(false);
+            
+            
+        }else{
+            
+        }
+
+    }
 }

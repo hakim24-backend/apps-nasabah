@@ -96,7 +96,7 @@ class Akun extends \yii\db\ActiveRecord
         $akun->password_hash = Yii::$app->getSecurity()->generatePasswordHash($password);
         $akun->access_token = Yii::$app->getSecurity()->generateRandomString();
         $akun->tanggal_waktu_pembuatan = date('Y-m-d H:i:s');
-        $akun->id_status_akun = 2;
+        $akun->id_status_akun = 3;
         $akun->id_jenis_akun = $id_jenis_akun;
         $akun->save(false);
 
