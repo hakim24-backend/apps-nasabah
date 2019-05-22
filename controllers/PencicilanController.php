@@ -87,7 +87,6 @@ class PencicilanController extends Controller
             $cicilan = (int)$value['total'];
         }
         $totalCicilan = json_encode($cicilan);
-        // $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
 
         return $this->render('cicilan', [
             'searchModel' => $searchModel,
@@ -112,32 +111,16 @@ class PencicilanController extends Controller
         $info = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
         $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$info->id_jenis_peminjaman])->one();
         $cicilanDenda = Pencicilan::find()->where(['id'=>$id])->one();
-        $data = Pencicilan::find()->select('count(id_peminjaman) as total')->groupBy('id_peminjaman')->where(['id_peminjaman'=>$model->id_peminjaman])->andWhere(['id_status_bayar'=>2])->asArray()->all();
-        $cicilan = [];
-        foreach ($data as $key => $value) {
-            $cicilan = (int)$value['total'];
-        }
-        $totalCicilan = json_encode($cicilan);
+
+        $totalCicilan = Pencicilan::getTotalCicilan($model->id_peminjaman);
 
         if ($peminjaman->id_jenis_peminjaman == 1) {
             //lunas dipercepat jaminan
-            if ($totalCicilan == '[]') {
-                $intervalDurasi = $peminjaman->durasi - 0;
-            } else {
-                $intervalDurasi = $peminjaman->durasi - $totalCicilan;
-            }
-            $sisaCicilan = ($peminjaman->nominal_peminjaman/$peminjaman->durasi)*$intervalDurasi;
-            $rumus = ($sisaCicilan)+(5/100*$sisaCicilan);
+            $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman);
             $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
         } else {
             //lunas dipercepat non-jaminan
-            if ($totalCicilan == '[]') {
-                $intervalDurasi = $peminjaman->durasi - 0;
-            } else {
-                $intervalDurasi = $peminjaman->durasi - $totalCicilan;
-            }
-            $sisaCicilan = ($peminjaman->nominal_pencicilan)*$intervalDurasi;
-            $rumus = ($sisaCicilan)+(5/100*$sisaCicilan);
+            $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman);
             $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
         }
 
@@ -221,23 +204,11 @@ class PencicilanController extends Controller
 
         if ($peminjaman->id_jenis_peminjaman == 1) {
             //lunas dipercepat jaminan
-            if ($totalCicilan == '[]') {
-                $intervalDurasi = $peminjaman->durasi - 0;
-            } else {
-                $intervalDurasi = $peminjaman->durasi - $totalCicilan;
-            }
-            $sisaCicilan = ($peminjaman->nominal_peminjaman/$peminjaman->durasi)*$intervalDurasi;
-            $rumus = ($sisaCicilan)+(5/100*$sisaCicilan);
+            $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman);
             $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
         } else {
             //lunas dipercepat non-jaminan
-            if ($totalCicilan == '[]') {
-                $intervalDurasi = $peminjaman->durasi - 0;
-            } else {
-                $intervalDurasi = $peminjaman->durasi - $totalCicilan;
-            }
-            $sisaCicilan = ($peminjaman->nominal_pencicilan)*$intervalDurasi;
-            $rumus = ($sisaCicilan)+(5/100*$sisaCicilan);
+            $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman);
             $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
         }
 
