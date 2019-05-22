@@ -43,8 +43,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         'value'=>function($model){
                             if ($model->akun->id_status_akun == 1) {
                                 return '<span class="label label-success">Aktif</span>';
-                            } else {
-                                return '<span class="label label-danger">Tidak Aktif</span>';
+                            } elseif($model->akun->id_status_akun == 2) {
+                                return '<span class="label label-warning">Tidak Aktif</span>';
+                            } elseif ($model->akun->id_status_akun == 3) {
+                                return '<span class="label label-danger">Belum terverifikasi</span>';
                             }
                         }
                     ],
