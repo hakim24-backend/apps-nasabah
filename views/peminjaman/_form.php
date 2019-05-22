@@ -24,7 +24,7 @@ use kartik\select2\Select2;
                 'data' => $nama,
                 'options' => [
                     'placeholder' => 'Pilih Nasabah...', 
-                    'id'=>'nama',
+                    'id'=>'email',
                     'required'=>true,
                 ],
                 'pluginOptions' => [
@@ -33,7 +33,10 @@ use kartik\select2\Select2;
                 ],
             ]) ?>
 
-            <?= $form->field($model, 'alamat')->textInput(['maxlength' => true,'required'=>true]) ?>
+            <div id="nasabah">
+            </div>
+
+            <!-- <?= $form->field($model, 'alamat')->textInput(['maxlength' => true,'required'=>true]) ?> -->
 
             <?= $form->field($model, 'nik_ktp')->textInput(['maxlength' => true,'required'=>true]) ?>
 
@@ -143,6 +146,17 @@ use kartik\select2\Select2;
                   }
                 })
             }
+        });
+
+        $('#email').on('change',function(){
+            var id = $('#email').val();
+            $.ajax({
+              url : '" . Yii::$app->urlManager->baseUrl."/peminjaman/get-nasabah?id='+id,
+              dataType : 'html',
+              success: function (data) {
+                $('#nasabah').html(data);
+              }
+            })
         });
 
     ")

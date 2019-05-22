@@ -132,15 +132,19 @@ class SiteController extends Controller
     public function actionConfirm($access_token)
     {
         $account = Akun::find()->where(['access_token'=>$access_token])->one();
+        $nasabah = Nasabah::find()->where(['id_akun'=>$account->id])->one();
         if ($account) {
-            # code...
             $account->id_status_akun = 2;
             $account->access_token = Yii::$app->security->generateRandomString();
             $account->save(false);
-            
-            
+
+            return $this->render('success', [
+                'nasabah' => $nasabah,
+            ]);
         }else{
-            
+            return $this->render('failed', [
+                'nasabah' => $nasabah,
+            ]);
         }
 
     }

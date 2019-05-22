@@ -20,6 +20,7 @@ use Yii;
  * @property string $jaminan
  * @property string $foto_ktp
  * @property string $foto_bersama_ktp
+ * @property string $foto_optional
  * @property string $tanggal_waktu_pembuatan waktu_pembuatan_data
  * @property int $id_status_peminjaman
  * @property int $id_pengguna
@@ -52,7 +53,7 @@ class Peminjaman extends \yii\db\ActiveRecord
             [['nomor_kontrak'], 'string', 'max' => 15],
             [['nama', 'alamat', 'jaminan'], 'string', 'max' => 100],
             [['nik_ktp'], 'string', 'max' => 20],
-            [['foto_ktp', 'foto_bersama_ktp'], 'string', 'max' => 255],
+            [['foto_ktp', 'foto_bersama_ktp','foto_optional'], 'string', 'max' => 255],
             [['nomor_kontrak'], 'unique'],
             [['id_nasabah'], 'exist', 'skipOnError' => true, 'targetClass' => Nasabah::className(), 'targetAttribute' => ['id_nasabah' => 'id']],
             [['id_jenis_peminjaman'], 'exist', 'skipOnError' => true, 'targetClass' => PeminjamanJenis::className(), 'targetAttribute' => ['id_jenis_peminjaman' => 'id']],
@@ -81,6 +82,7 @@ class Peminjaman extends \yii\db\ActiveRecord
             'jaminan' => 'Jaminan',
             'foto_ktp' => 'Foto KTP',
             'foto_bersama_ktp' => 'Foto Bersama KTP',
+            'foto_optional' => 'Foto Optional',
             'tanggal_waktu_pembuatan' => 'Tanggal Waktu Pembuatan',
             'id_status_peminjaman' => 'Status Peminjaman',
             'id_pengguna' => 'Id Pengguna',

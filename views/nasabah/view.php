@@ -18,8 +18,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <a class="btn btn-warning" href="<?php echo Url::to(['nasabah/index']) ?>">Kembali</a>
         <?php if ($akun->id_status_akun == 2) { ?>
             <?= Html::a('Aktifkan Akun', ['aktif-akun', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
-        <?php } else { ?>
+        <?php } elseif($akun->id_status_akun == 1) { ?>
             <?= Html::a('Non-Aktifkan Akun', ['non-aktif-akun', 'id' => $model->id], ['class' => 'btn btn-danger']) ?>
+        <?php } elseif ($akun->id_status_akun == 3) { ?>
+            <!-- noaction -->
         <?php } ?>
     </p>
 

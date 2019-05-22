@@ -1,0 +1,1 @@
+Selamat akun dengan email <?=$nasabah->email?> sudah terverifikasi, Silakan menunggu review dari admin untuk pengaktifan akun. Terima kasih atas kesabarannya.

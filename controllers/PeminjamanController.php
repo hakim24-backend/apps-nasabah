@@ -14,6 +14,8 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Uploadedfile;
 use yii\helpers\ArrayHelper;
+use kartik\file\FileInput;
+use yii\helpers\Html;
 
 /**
  * PeminjamanController implements the CRUD actions for Peminjaman model.
@@ -82,7 +84,7 @@ class PeminjamanController extends Controller
         ->all();
 
         //data nasabah
-        $nama = ArrayHelper::map($data, 'id', 'nama');
+        $nama = ArrayHelper::map($data, 'id', 'email');
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
@@ -281,6 +283,23 @@ class PeminjamanController extends Controller
             echo '
 
             ';
+        }
+    }
+
+    public function actionGetNasabah($id)
+    {
+        $data = Nasabah::find()->where(['id'=>$id])->one();
+
+        if ($data) {
+            echo '
+            <input type="hidden" id="alamat" class="form-control" name="alamat" maxlength="15" aria-invalid="false" value="'.$data->alamat.'" readonly ><br>
+
+            <input type="hidden" id="foto_ktp" class="form-control" name="foto_ktp" maxlength="15" aria-invalid="false" value="'.$data->foto_ktp.'" readonly ><br>
+
+            <input type="hidden" id="foto_ktp_2" class="form-control" name="foto_ktp_2" maxlength="15" aria-invalid="false" value="'.$data->foto_bersama_ktp.'" readonly ><br>
+            ';
+        } else {
+            echo '';
         }
     }
 
