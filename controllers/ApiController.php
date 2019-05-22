@@ -55,12 +55,12 @@ class ApiController extends \yii\rest\Controller
             	$transaction = Yii::$app->db->beginTransaction();
                 try{
 	                $akun = new Akun();
-	                $akun_id = $akun->createAkun($akun, $param['password'], 2);
+	                $akun = $akun->createAkun($akun, $param['password'], 2);
 
-	                if($akun_id){
+	                if($akun->id){
 
 	                	$nasabah = new Nasabah();
-	                	$nasabah->id_akun = $akun_id;
+	                	$nasabah->id_akun = $akun->id;
 	                	$nasabah->nama = $param['name'];
 	                	$nasabah->alamat = $param['address'];
 	                	$nasabah->tempat_lahir = $param['birth_place'];
@@ -73,10 +73,10 @@ class ApiController extends \yii\rest\Controller
 
 	                        if($nasabah->save(false)){
 
-								$email = \Yii::$app->mailer->compose('index')
+								$email = \Yii::$app->mailer->compose('index', ['access_token'=>$akun->access_token])
 	                                ->setTo($nasabah->email)
 	                                ->setFrom(['mamorasoft.firebase@gmail.com'])
-	                                ->setSubject('Signup Confirmation')
+	                                ->setSubject('Konfirmasi Pendaftaran')
 	                                ->send();
 
 	                            if ($email){

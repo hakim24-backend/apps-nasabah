@@ -9,6 +9,8 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\Akun;
+use app\models\Nasabah;
 
 class SiteController extends Controller
 {
@@ -22,11 +24,11 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error'],
+                        'actions' => ['login', 'error','confirm'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index','confirm'],
+                        'actions' => ['logout', 'index'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],

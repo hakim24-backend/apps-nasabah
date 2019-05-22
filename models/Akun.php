@@ -100,6 +100,6 @@ class Akun extends \yii\db\ActiveRecord
         $akun->id_jenis_akun = $id_jenis_akun;
         $akun->save(false);
 
-        return $akun->id;
+        return $akun;
     }
 }
