@@ -1,6 +1,6 @@
 <?php
 use yii\helpers\Url;
-$this->title = 'Monitoring Nasabah '.$model->nama;
+$this->title = 'Monitoring Nasabah '.$model->nama.', Tanggal dan waktu '.$model->tanggal_waktu_posisi;
 ?>
 
 <p>
