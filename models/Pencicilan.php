@@ -111,22 +111,14 @@ class Pencicilan extends \yii\db\ActiveRecord
     {
         if ($id_jenis_peminjaman == 1) {
             //lunas dipercepat jaminan
-            if ($totalCicilan == '[]') {
-                $intervalDurasi = $durasi - 0;
-            } else {
-                $intervalDurasi = $durasi - $totalCicilan;
-            }
+            $intervalDurasi = $durasi - $totalCicilan;
             $sisaCicilan = ($nominal_peminjaman/$durasi)*$intervalDurasi;
 
             return ($sisaCicilan)+($besar_pinalti_langsung_lunas/100*$sisaCicilan);
 
         } else {
             //lunas dipercepat non-jaminan
-            if ($totalCicilan == '[]') {
-                $intervalDurasi = $durasi - 0;
-            } else {
-                $intervalDurasi = $durasi - $totalCicilan;
-            }
+            $intervalDurasi = $durasi - $totalCicilan;
 
             return ($nominal_peminjaman/$durasi)*$intervalDurasi;
         }

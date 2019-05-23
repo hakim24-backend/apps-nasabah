@@ -440,30 +440,37 @@ class ApiController extends \yii\rest\Controller
         $param=\Yii::$app->request->post();
 
         $response= array();
-        if ($param['customer_id']!="" && $param['phone_number']!="") {
+        if ($param['customer_id']!="" && $param['phone_number']!="" && $param['password']!="") {
             
             $nasabah = Nasabah::find()->where(['id'=>$param['customer_id']])->one();
             if ($nasabah) {
-            	$transaction = Yii::$app->db->beginTransaction();
-                try{
-	            	$nasabah->nomor_telepon = $param['phone_number'];
-	            	if($nasabah->save(false)){
-	            		$riwayat_nomor_telepon = new NasabahRiwayatNomorTelepon();
-	                	$riwayat_nomor_telepon->id_nasabah = $nasabah->id;
-	                	$riwayat_nomor_telepon->nomor_telepon = $nasabah->nomor_telepon;
-	                	$riwayat_nomor_telepon->tanggal_waktu_pembuatan = $akun->tanggal_waktu_pembuatan;
+            	$akun = Akun::find()->where(['id'=>$nasabah->id_akun])->one();
+            	if ($nasabah->validatePassword($param['password'], $akun->password_hash)) {
+	            	$transaction = Yii::$app->db->beginTransaction();
+	                try{
+		            	$nasabah->nomor_telepon = $param['phone_number'];
+		            	if($nasabah->save(false)){
+		            		$riwayat_nomor_telepon = new NasabahRiwayatNomorTelepon();
+		                	$riwayat_nomor_telepon->id_nasabah = $nasabah->id;
+		                	$riwayat_nomor_telepon->nomor_telepon = $nasabah->nomor_telepon;
+		                	$riwayat_nomor_telepon->tanggal_waktu_pembuatan = $akun->tanggal_waktu_pembuatan;
 
-	                	if($riwayat_nomor_telepon->save(false)){
-	                		$response['message'] = 'Berhasil mengupdate nomor kartu sim';
-	            			$response['status'] = 1;
-	                	}
+		                	if($riwayat_nomor_telepon->save(false)){
+		                		$response['message'] = 'Berhasil mengupdate nomor telepon';
+		            			$response['status'] = 1;
+		            			$transaction->commit();
+		                	}
 
-	            	}
-	            } catch (\Exception $e) {
-                    $transaction->rollBack();
-                    $response['message'] = "Gagal mengupdate nomor telepon";
-                    $response['status'] = 0;
-                }
+		            	}
+		            } catch (\Exception $e) {
+	                    $transaction->rollBack();
+	                    $response['message'] = "Gagal mengupdate nomor telepon";
+	                    $response['status'] = 0;
+	                }
+	            } else {
+	            	$response['message'] = 'Password salah';
+            		$response['status'] = 0;
+	            }
             }else{
                 $response['message'] = 'Nasabah tidak ditemukan';
             	$response['status'] = 0;
