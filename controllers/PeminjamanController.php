@@ -523,8 +523,6 @@ class PeminjamanController extends Controller
             }
 
             $model->nama = $dataNasabah->nama;
-            $model->id_jenis_durasi = $post['jenis-durasi'];
-            $model->id_status_peminjaman = $post['peminjaman'];
             $model->save(false);
 
             Yii::$app->session->setFlash('success', "Update Data Peminjaman Berhasil");
