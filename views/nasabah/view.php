@@ -36,6 +36,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         'tanggal_lahir',
                         'jenis_kelamin',
                         'nomor_telepon',
+                        [
+                            'attribute' => 'nomor_kartu_sim',
+                            'value' => $model->nomor_kartu_sim != null ? $model->nomor_kartu_sim : 'Belum Ada'
+                        ],
                         'email:email',
                         [
                             'attribute' => 'foto_ktp',

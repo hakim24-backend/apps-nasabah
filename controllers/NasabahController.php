@@ -8,6 +8,7 @@ use app\models\Peminjaman;
 use app\models\Akun;
 use app\models\NasabahBukuTelepon;
 use app\models\NasabahBukuTeleponSearch;
+use app\models\NasabahRiwayatNomorTeleponSearch;
 use app\models\NasabahSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -80,11 +81,6 @@ class NasabahController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->query->andWhere(['id_nasabah' => $id]);
 
-        // $dataProvider = new ActiveDataProvider([
-        //     'query' => NasabahBukuTelepon::find()
-        //               ->where(['id_nasabah' => $id])
-        // ]);
-
         return $this->render('phone', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -130,7 +126,14 @@ class NasabahController extends Controller
 
     public function actionHistory($id)
     {
-        
+        $searchModel = new NasabahRiwayatNomorTeleponSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andWhere(['id_nasabah' => $id]);
+
+        return $this->render('history', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     /**
