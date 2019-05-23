@@ -71,15 +71,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     [
                         'class' => 'yii\grid\ActionColumn',
-                        'template' => '{monitor} {telepon} {view} {update} {delete}',
+                        'template' => '{history} {telepon} {view} {update} {delete}',
                         'contentOptions' => ['style'=>'text-align: right'],
                         'buttons' => [
-
-                            'monitor' => function($url, $model, $key){
-                                $data = Peminjaman::find()->where(['id_nasabah'=>$model['id']])->andWhere(['id_status_peminjaman'=>1])->count();
-                                if ($data > 0 ) {
-                                    return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-map-marker"></span>']),['nasabah/monitor','id'=>$model->id], ['class' => 'btn btn-primary modalButtonView']);
-                                }
+                            
+                            'history' => function($url, $model, $key){
+                                return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-refresh"></span>']),['nasabah/history','id'=>$model->id], ['class' => 'btn btn-primary modalButtonView']);
                             },
                             'telepon' => function($url, $model, $key){
                                 return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-book"></span>']),['nasabah/phone','id'=>$model->id], ['class' => 'btn btn-success modalButtonView']);

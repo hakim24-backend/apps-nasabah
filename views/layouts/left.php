@@ -20,6 +20,7 @@
                     ['label' => 'Menu Pinjaman Online', 'options' => ['class' => 'header']],
                     // ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
                     ['label' => 'Master Nasabah', 'icon' => 'users', 'url' => ['/nasabah/index']],
+                    ['label' => 'Monitoring Nasabah', 'icon' => 'map-marker', 'url' => ['/monitor/index']],
                     ['label' => 'Peminjaman', 'icon' => 'credit-card', 'url' => ['/peminjaman/index']],
                     ['label' => 'Pencicilan', 'icon' => 'balance-scale', 'url' => ['/pencicilan/index']],
                     ['label' => 'Pengguna', 'icon' => 'user', 'url' => ['/pengguna/index']],

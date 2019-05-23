@@ -111,7 +111,11 @@ function to_rp($val)
                         'attribute' => 'foto_optional',
                         'format'=>'html',
                         'value'=>function($data){
-                            return Html::img('../../web/foto/'.$data['foto_optional'],['width' => '150px']);
+                            if ($data->foto_optional == null) {
+                                return 'Belum ada foto';
+                            } else {
+                                return Html::img('../../web/foto/'.$data['foto_optional'],['width' => '150px']);
+                            }
                         }
                     ],
                     'tanggal_waktu_pembuatan'

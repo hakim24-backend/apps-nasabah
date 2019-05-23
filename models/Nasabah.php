@@ -103,6 +103,14 @@ class Nasabah extends \yii\db\ActiveRecord
         return $this->hasMany(Peminjaman::className(), ['id_nasabah' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPeminjamenOne()
+    {
+        return $this->hasOne(Peminjaman::className(), ['id_nasabah' => 'id']);
+    }
+
     public function validatePassword($password, $password_hash)
     {
         return Yii::$app->security->validatePassword($password, $password_hash);
