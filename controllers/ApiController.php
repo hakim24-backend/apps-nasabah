@@ -328,6 +328,10 @@ class ApiController extends \yii\rest\Controller
     			$bills = Pencicilan::find()->where(['id_peminjaman'=>$credit['id']])->orderBy(['periode'=>SORT_ASC])->asArray()->all();
     			$peminjaman_jenis = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->asArray()->one();
 
+    			//lunas dipercepat jamina	
+    			$totalCicilan = Pencicilan::getTotalCicilan($credit['id']);
+	            $response['direct_payment_amount'] = Pencicilan::getLunasDipercepat($credit['id_jenis_peminjaman'], $totalCicilan, $credit['durasi'], $credit['nominal_peminjaman'], $peminjaman_jenis['besar_pinalti_langsung_lunas']);
+
     			foreach ($bills as $key => $value) {
 					//denda
 					if($value['id_status_bayar'] == 1) {
@@ -340,6 +344,9 @@ class ApiController extends \yii\rest\Controller
 		        			$value['nominal_denda'] = 0;
 		        		}
 	        		}
+
+	        		//pelunasan
+	        		$response['direct_payment_amount'] += $value['nominal_denda'];
 
     				//nama_pelayan
         			$pengguna = Pengguna::find()->where(['id'=>$value['id_pengguna']])->one();
@@ -415,9 +422,7 @@ class ApiController extends \yii\rest\Controller
 		    	// }
 
     			
-	            //lunas dipercepat jamina	
-    			$totalCicilan = Pencicilan::getTotalCicilan($credit['id']);
-	            $response['direct_payment_amount'] = Pencicilan::getLunasDipercepat($credit['id_jenis_peminjaman'], $totalCicilan, $credit['durasi'], $credit['nominal_peminjaman'], $peminjaman_jenis['besar_pinalti_langsung_lunas']);
+	         
 		        
         		$response['bill'] = $bills;
 	        	$response['message'] = 'Berhasil mengambil data';
