@@ -103,8 +103,7 @@ class Pencicilan extends \yii\db\ActiveRecord
 
     public function getTotalCicilan($id_peminjaman)
     {
-        $data = Pencicilan::find()->select('count(*) as total')->where(['id_peminjaman'=>$id_peminjaman])->andWhere(['id_status_bayar'=>2])->asArray()->all();
-
+        $data = Pencicilan::find()->select('count(*) as total')->where(['id_peminjaman'=>$id_peminjaman])->andWhere(['id_status_bayar'=>2])->asArray()->one();
         return $data['total'];
     }
 
