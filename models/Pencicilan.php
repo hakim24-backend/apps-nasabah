@@ -109,15 +109,28 @@ class Pencicilan extends \yii\db\ActiveRecord
 
     public function getLunasDipercepat($id_jenis_peminjaman,$totalCicilan,$durasi,$nominal_peminjaman, $besar_pinalti_langsung_lunas, $nominal_cicilan, $id_peminjaman, $nominal_tabungan_ditahan)
     {
+        $pencicilan = Pencicilan::find()->where(['id_peminjaman'=>$id_peminjaman])->orderBy(['periode'=>SORT_ASC])->all();
+        
         if ($id_jenis_peminjaman == 1) {
-            //lunas dipercepat jaminan
-            $intervalDurasi = $durasi - $totalCicilan;
+            $periode = 0;
+            $tertinggal = 0;
+            foreach ($pencicilan as $key => $value) {
+                if(strtotime(date("Y-m-d")) < strtotime($value->tanggal_jatuh_tempo)){
+                    $periode = $pencicilan->periode;
+                    break;
+                } else {
+                    if($pencicilan->id_status_bayar == 1){
+                        $tertinggal += $nominal_cicilan;
+                    }
+                }
+            }
+
+            $intervalDurasi = $durasi - $periode;
             $sisaCicilan = ($nominal_peminjaman / $durasi) * $intervalDurasi;
 
-            return ($sisaCicilan)+($besar_pinalti_langsung_lunas/100*$sisaCicilan);
+            return $tertinggal+($sisaCicilan)+($besar_pinalti_langsung_lunas/100*$sisaCicilan);
 
         } else {
-            $pencicilan = Pencicilan::find()->where(['id'=>$id_peminjaman])->all();
             $pernah_telat = false;
 
             foreach ($pencicilan as $key => $value) {
