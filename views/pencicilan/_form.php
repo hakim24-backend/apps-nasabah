@@ -76,7 +76,7 @@ function to_rp($val)
             <?= Html::dropDownlist('cicilan',0,[1=>'Sesuai Durasi',2=>'Langsung Lunas'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>
             <br>
 
-            <!-- <?php
+            <?php
             echo $form->field($model, 'nominal_cicilan')->widget(MaskMoney::classname(), [
                 'pluginOptions' => [
                 'prefix' => 'Rp ',
@@ -88,7 +88,7 @@ function to_rp($val)
                     'required'=>'required'
                 ]
             ]);
-            ?> -->
+            ?>
 
             <div class="form-group">
                 <?= Html::submitButton('Save', ['class' => 'btn btn-success btn-save']) ?>
@@ -118,7 +118,13 @@ $this->registerJs("
         var cicilan_denda = BigInt(cicilan_fix)+BigInt(denda_fix);
         var cicilan_lunas_denda = BigInt(cicilan_lunas_fix)+BigInt(denda_fix);
         
-        
+        $.ajax({
+          url : '" . Yii::$app->urlManager->baseUrl."/pencicilan/get-nominal-cicilan?id='+id,
+          dataType : 'html',
+          success: function (data) {
+            $('#durasi').html(data);
+          }
+        })
 
     });
  
