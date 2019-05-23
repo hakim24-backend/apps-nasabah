@@ -112,7 +112,7 @@ class Pencicilan extends \yii\db\ActiveRecord
         return json_encode($cicilan);
     }
 
-    public function getLunasDipercepat($id_jenis_peminjaman,$totalCicilan,$durasi,$nominal_peminjaman)
+    public function getLunasDipercepat($id_jenis_peminjaman,$totalCicilan,$durasi,$nominal_peminjaman, $besar_pinalti_langsung_lunas)
     {
         if ($id_jenis_peminjaman == 1) {
             //lunas dipercepat jaminan
@@ -123,7 +123,7 @@ class Pencicilan extends \yii\db\ActiveRecord
             }
             $sisaCicilan = ($nominal_peminjaman/$durasi)*$intervalDurasi;
 
-            return ($sisaCicilan)+(5/100*$sisaCicilan);
+            return ($sisaCicilan)+($besar_pinalti_langsung_lunas/100*$sisaCicilan);
 
         } else {
             //lunas dipercepat non-jaminan
