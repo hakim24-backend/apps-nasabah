@@ -33,9 +33,6 @@ use kartik\select2\Select2;
                 ],
             ]) ?>
 
-            <div id="nasabah">
-            </div>
-
             <!-- <?= $form->field($model, 'alamat')->textInput(['maxlength' => true,'required'=>true]) ?> -->
 
             <?= $form->field($model, 'nik_ktp')->textInput(['maxlength' => true,'required'=>true]) ?>
@@ -75,10 +72,9 @@ use kartik\select2\Select2;
 
             <?= $form->field($model, 'durasi')->textInput(['maxlength' => true,'required' => true]) ?>
 
-            <?= $form->field($model, 'foto_ktp')->widget(FileInput::classname(), [
+            <?= $form->field($model, 'foto_optional')->widget(FileInput::classname(), [
                 'options' => [
-                    'accept' => 'image/*',
-                    'required'=>true,
+                    'accept' => 'image/*'
                 ],
                 'pluginOptions' => [
                     // 'showPreview' => false,
@@ -90,24 +86,8 @@ use kartik\select2\Select2;
                 ],
             ]) ?>
 
-            <!-- <?= $form->field($model, 'foto_ktp')->textInput(['maxlength' => true]) ?> -->
-
-            <?= $form->field($model, 'foto_bersama_ktp')->widget(FileInput::classname(), [
-                'options' => [
-                    'accept' => 'image/*',
-                    'required'=>true,
-                ],
-                'pluginOptions' => [
-                    // 'showPreview' => false,
-                    // 'showCaption' => true,
-                    // 'showRemove' => true,
-                    'removeClass' => 'btn btn-danger',
-                    'showUpload' => false,
-                    'removeIcon' => '<i class="glyphicon glyphicon-trash"></i>'
-                ],
-            ]) ?>
-
-            <!-- <?= $form->field($model, 'foto_bersama_ktp')->textInput(['maxlength' => true]) ?> -->
+            <div id="nasabah">
+            </div>
 
             <div class="form-group">
                 <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

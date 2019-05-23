@@ -107,6 +107,13 @@ function to_rp($val)
                             return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
                         }
                     ],
+                    [
+                        'attribute' => 'foto_optional',
+                        'format'=>'html',
+                        'value'=>function($data){
+                            return Html::img('../../web/foto/'.$data['foto_optional'],['width' => '150px']);
+                        }
+                    ],
                     'tanggal_waktu_pembuatan'
                     // 'id_pengguna',
                 ],

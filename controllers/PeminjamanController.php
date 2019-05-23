@@ -97,20 +97,17 @@ class PeminjamanController extends Controller
                 $nomor_kontrak_tipe = str_replace('/','-',$nomor_kontrak);
                 
 
-                //upload foto ktp
-                $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
-                $images_name_ktp = 'ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
-                $pathKtp = 'foto/'.$images_name_ktp;
-                if ($imagesKtp->saveAs($pathKtp)) {
-                    $model->foto_ktp = $images_name_ktp;
-                }
+                //upload foto optional
+                $imagesKtp = Uploadedfile::getInstance($model,'foto_optional');
 
-                //upload foto ktp bersama
-                $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
-                $images_name_ktp_2 = 'bersama_ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
-                $pathKtp2 = 'foto/'.$images_name_ktp_2;
-                if ($imagesKtp2->saveAs($pathKtp2)) {
-                    $model->foto_bersama_ktp = $images_name_ktp_2;
+                if ($imagesKtp != null) {
+                    $images_name_ktp = 'ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
+                    $pathKtp = 'foto/'.$images_name_ktp;
+                    if ($imagesKtp->saveAs($pathKtp)) {
+                        $model->foto_optional = $images_name_ktp;
+                    }
+                } else {
+                    $model->foto_optional = null;
                 }
 
                 $model->id_nasabah = $model->nama;
@@ -152,6 +149,9 @@ class PeminjamanController extends Controller
                     $model->nominal_pencicilan = $cicilan;
                 }
 
+                $model->alamat = $post['alamat'];
+                $model->foto_ktp = $post['foto_ktp'];
+                $model->foto_bersama_ktp = $post['foto_ktp_2'];
                 $model->nomor_kontrak = $post['nomor_kontrak'];
                 $model->id_jenis_durasi = $post['jenis-durasi'];
                 $model->tanggal_waktu_pembuatan = date('Y-m-d H:i:s');

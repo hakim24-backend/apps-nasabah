@@ -140,10 +140,12 @@ class SiteController extends Controller
             $account->access_token = Yii::$app->security->generateRandomString();
             $account->save(false);
 
+            $this->layout = 'main-login.php';
             return $this->render('success', [
                 'nasabah' => $nasabah,
             ]);
         }else{
+            $this->layout = 'main-login.php';
             return $this->render('failed', [
                 'nasabah' => $nasabah,
             ]);
