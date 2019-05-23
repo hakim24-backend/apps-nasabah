@@ -128,6 +128,11 @@ class NasabahController extends Controller
         return $this->redirect(['nasabah/index']);
     }
 
+    public function actionHistory($id)
+    {
+        
+    }
+
     /**
      * Creates a new Nasabah model.
      * If creation is successful, the browser will be redirected to the 'view' page.

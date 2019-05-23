@@ -101,7 +101,7 @@ class PeminjamanController extends Controller
                 $imagesKtp = Uploadedfile::getInstance($model,'foto_optional');
 
                 if ($imagesKtp != null) {
-                    $images_name_ktp = 'ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
+                    $images_name_ktp = 'ktp-optional-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
                     $pathKtp = 'foto/'.$images_name_ktp;
                     if ($imagesKtp->saveAs($pathKtp)) {
                         $model->foto_optional = $images_name_ktp;
@@ -315,6 +315,7 @@ class PeminjamanController extends Controller
         $model = $this->findModel($id);
         $oldKtp = $model->foto_ktp;
         $oldKtp2 = $model->foto_bersama_ktp;
+        $oldKtp3 = $model->foto_optional;
 
         //data nasabah
         $nama = ArrayHelper::map(Nasabah::find()->all(), 'id', 'nama');
@@ -325,16 +326,18 @@ class PeminjamanController extends Controller
             $nomor_kontrak = $model->nomor_kontrak;
             $nomor_kontrak_tipe = str_replace('/','-',$nomor_kontrak);
 
-            //foto ktp null and foto bersama ktp null
-            if ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') == null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') == null) {
+            //1 foto ktp null, foto bersama ktp null and foto optional null
+            if ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') == null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') == null && $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional') == null) {
 
                 $model->foto_ktp = $oldKtp;
                 $model->foto_bersama_ktp = $oldKtp2;
+                $model->foto_optional = $oldKtp3;
 
-            //foto ktp not null and foto bersama ktp null
-            } elseif ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') != null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') == null) {
+            //2 foto ktp not null, foto bersama ktp null and foto_optional null
+            } elseif ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') != null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') == null && $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional') == null) {
                 
                 //upload foto ktp
+                unlink('foto/'.$oldKtp);
                 $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
                 $images_name_ktp = 'ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
                 $pathKtp = 'foto/'.$images_name_ktp;
@@ -345,24 +348,50 @@ class PeminjamanController extends Controller
                 //no update upload foto ktp bersama
                 $model->foto_bersama_ktp = $oldKtp2;
 
-            //foto ktp null and foto bersama ktp not null
-            } elseif ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') == null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') != null) {
+                //no update upload foto optional
+                $model->foto_optional = $oldKtp3;
+
+            //3 foto ktp null, foto bersama ktp not null and foto optional null
+            } elseif ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') == null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') != null && $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional') == null) {
 
                 //no update upload foto ktp
                 $model->foto_ktp = $oldKtp;
 
                 //upload foto ktp bersama
+                unlink('foto/'.$oldKtp2);
                 $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
                 $images_name_ktp_2 = 'bersama_ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp2->extension;
                 $pathKtp2 = 'foto/'.$images_name_ktp_2;
                 if ($imagesKtp2->saveAs($pathKtp2)) {
                     $model->foto_bersama_ktp = $images_name_ktp_2;
                 }
-            
-            //foto ktp not null and foto bersama ktp not null
-            } else {
 
+                //no update upload foto optional
+                $model->foto_optional = $oldKtp3;
+            
+            //4 foto ktp not null, foto bersama ktp null and foto optional not null
+            } elseif ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') == null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') == null && $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional') != null) {
+                
+                //no update upload foto ktp
+                $model->foto_ktp = $oldKtp;
+
+                //no update upload foto ktp bersama
+                $model->foto_bersama_ktp = $oldKtp2;
+
+                //upload foto optional
+                unlink('foto/'.$oldKtp3);
+                $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional');
+                $images_name_ktp_3 = 'ktp-optional-'.$nomor_kontrak_tipe.'.'.$imagesKtp3->extension;
+                $pathKtp3 = 'foto/'.$images_name_ktp_3;
+                if ($imagesKtp3->saveAs($pathKtp3)) {
+                    $model->foto_optional = $images_name_ktp_3;
+                }
+
+            //5 foto ktp not null, foto bersama ktp not null and foto optional null
+            } elseif ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') != null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') != null && $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional') == null) {
+                
                 //upload foto ktp
+                unlink('foto/'.$oldKtp);
                 $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
                 $images_name_ktp = 'ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
                 $pathKtp = 'foto/'.$images_name_ktp;
@@ -371,11 +400,92 @@ class PeminjamanController extends Controller
                 }
 
                 //upload foto ktp bersama
+                unlink('foto/'.$oldKtp2);
                 $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
                 $images_name_ktp_2 = 'bersama_ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp2->extension;
                 $pathKtp2 = 'foto/'.$images_name_ktp_2;
                 if ($imagesKtp2->saveAs($pathKtp2)) {
                     $model->foto_bersama_ktp = $images_name_ktp_2;
+                }
+
+                //no update upload foto optional
+                $model->foto_optional = $oldKtp3;
+
+            //6 foto ktp null, foto bersama ktp not null and foto optional not null
+            } elseif ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') == null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') != null && $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional') != null) {
+                
+                //no update upload foto ktp
+                $model->foto_ktp = $oldKtp;
+
+                //upload foto ktp bersama
+                unlink('foto/'.$oldKtp2);
+                $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
+                $images_name_ktp_2 = 'bersama_ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp2->extension;
+                $pathKtp2 = 'foto/'.$images_name_ktp_2;
+                if ($imagesKtp2->saveAs($pathKtp2)) {
+                    $model->foto_bersama_ktp = $images_name_ktp_2;
+                }
+
+                //upload foto optional
+                unlink('foto/'.$oldKtp3);
+                $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional');
+                $images_name_ktp_3 = 'ktp-optional-'.$nomor_kontrak_tipe.'.'.$imagesKtp3->extension;
+                $pathKtp3 = 'foto/'.$images_name_ktp_3;
+                if ($imagesKtp3->saveAs($pathKtp3)) {
+                    $model->foto_optional = $images_name_ktp_3;
+                }
+
+            //7 foto ktp not null, foto bersama ktp null and foto optional not null
+            } elseif ($imagesKtp = Uploadedfile::getInstance($model,'foto_ktp') != null && $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp') == null && $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional') != null) {
+                
+                //upload foto ktp
+                unlink('foto/'.$oldKtp);
+                $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
+                $images_name_ktp = 'ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
+                $pathKtp = 'foto/'.$images_name_ktp;
+                if ($imagesKtp->saveAs($pathKtp)) {
+                    $model->foto_ktp = $images_name_ktp;
+                }
+
+                //upload foto optional
+                unlink('foto/'.$oldKtp3);
+                $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional');
+                $images_name_ktp_3 = 'ktp-optional-'.$nomor_kontrak_tipe.'.'.$imagesKtp3->extension;
+                $pathKtp3 = 'foto/'.$images_name_ktp_3;
+                if ($imagesKtp3->saveAs($pathKtp3)) {
+                    $model->foto_optional = $images_name_ktp_3;
+                }
+
+                //no update upload foto ktp bersama
+                $model->foto_bersama_ktp = $oldKtp2;
+
+            } else {
+
+                //upload foto ktp
+                unlink('foto/'.$oldKtp);
+                $imagesKtp = Uploadedfile::getInstance($model,'foto_ktp');
+                $images_name_ktp = 'ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp->extension;
+                $pathKtp = 'foto/'.$images_name_ktp;
+                if ($imagesKtp->saveAs($pathKtp)) {
+                    $model->foto_ktp = $images_name_ktp;
+                }
+
+                //upload foto ktp bersama
+                unlink('foto/'.$oldKtp2);
+                $imagesKtp2 = Uploadedfile::getInstance($model,'foto_bersama_ktp');
+                $images_name_ktp_2 = 'bersama_ktp-'.$nomor_kontrak_tipe.'.'.$imagesKtp2->extension;
+                $pathKtp2 = 'foto/'.$images_name_ktp_2;
+                if ($imagesKtp2->saveAs($pathKtp2)) {
+                    $model->foto_bersama_ktp = $images_name_ktp_2;
+                }
+
+                //upload foto optional
+                unlink('foto/'.$oldKtp3);
+                $imagesKtp3 = Uploadedfile::getInstance($model,'foto_optional');
+                $images_name_ktp_3 = 'ktp-optional-'.$nomor_kontrak_tipe.'.'.$imagesKtp3->extension;
+                $pathKtp3 = 'foto/'.$images_name_ktp_3;
+                if ($imagesKtp3->saveAs($pathKtp3)) {
+                    $model->foto_optional = $images_name_ktp_3;
                 }
             }
 

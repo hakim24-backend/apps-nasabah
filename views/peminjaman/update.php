@@ -126,6 +126,25 @@ use kartik\select2\Select2;
 		        ]);
 		    ?><br>
 
+            <?php
+                echo FileInput::widget([
+                    'model' => $model,
+                    'attribute' => 'foto_optional',
+                    'options'=>[
+                        'accept' => 'image/*'
+                    ],
+                    'pluginOptions' => [
+                        'initialPreview'=>[
+                            Html::img(Yii::$app->urlManager->createUrl(['foto/'.$model->foto_optional]),['style' => 'width:150px;']),
+                        ],
+                        'removeClass' => 'btn btn-danger',
+                        'showUpload' => false,
+                        'removeIcon' => '<i class="glyphicon glyphicon-trash"></i>',
+                        'overwriteInitial'=>false,
+                    ]
+                ]);
+            ?><br>
+
             <!-- <?= $form->field($model, 'foto_bersama_ktp')->textInput(['maxlength' => true]) ?> -->
 
             <div class="form-group">
