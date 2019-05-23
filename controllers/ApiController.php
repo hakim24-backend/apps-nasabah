@@ -247,7 +247,7 @@ class ApiController extends \yii\rest\Controller
 
             if ($customer) {
 
-            	$credit = Peminjaman::find()->where(['id_nasabah'=>$param['customer_id']])->asArray()->all();
+            	$credit = Peminjaman::find()->where(['id_nasabah'=>$param['customer_id']])->orderBy(['tanggal_waktu_pembuatan'=>SORT_DESC])->asArray()->all();
 
 	        	if ($credit) {
 
@@ -321,11 +321,11 @@ class ApiController extends \yii\rest\Controller
         		$get_late_penalty = 0;
         		$current_period = 0;
     			$bills = Pencicilan::find()->where(['id_peminjaman'=>$credit['id']])->orderBy(['periode'=>SORT_ASC])->asArray()->all();
+    			$peminjaman_jenis = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->asArray()->one();
 
     			foreach ($bills as $key => $value) {
 					//denda
 					if($value['id_status_bayar'] == 1) {
-						$peminjaman_jenis = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->asArray()->one();
 	        			// $value['nominal_denda'] = Peminjaman::getDenda($credit['id_jenis_durasi'], $value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
 	        			$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
 	        		} else {
@@ -361,53 +361,59 @@ class ApiController extends \yii\rest\Controller
         			$bills[$key] = $value;
 
         			//pre_pelunasan_calculation
-        			if($credit['id_status_peminjaman'] == 1){
-        				if($credit['id_jenis_peminjaman'] == 1){
-		        			if($current_period == 0){
-		        				if($value['id_status_bayar'] == 1){
-		        					$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
-		        				}
-		        				if(strtotime(date("Y-m-d")) < strtotime($value['tanggal_jatuh_tempo'])){
-		        					$current_period = 1;
-			        			}
-			        		} else {
-			        			$amount_left += ($credit['nominal_peminjaman'] / $credit['durasi']);
-			        		}
-			        	} else {
-			        		if($current_period == 0){
-		        				if($value['id_status_bayar'] == 1){
-		        					$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
-		        					if($value['nominal_denda'] > 0){
-		        						$get_late_penalty = 1;
-		        					}
-		        				} else {
-		        					if($value['nominal_denda_dibayar'] != null && $value['nominal_denda_dibayar'] > 0 ){
-		        						$get_late_penalty = 1;
-		        					}
-		        				}
-		        				if(strtotime(date("Y-m-d")) < strtotime($value['tanggal_jatuh_tempo'])){
-		        					$current_period = 1;
-			        			}
-			        		} else {
-			        			$amount_left += $credit['nominal_pencicilan'];
-			        		}
-			        	}
-		        	}
+        			// if($credit['id_status_peminjaman'] == 1){
+        			// 	if($credit['id_jenis_peminjaman'] == 1){
+		        	// 		if($current_period == 0){
+		        	// 			if($value['id_status_bayar'] == 1){
+		        	// 				$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
+		        	// 			}
+		        	// 			if(strtotime(date("Y-m-d")) < strtotime($value['tanggal_jatuh_tempo'])){
+		        	// 				$current_period = 1;
+			        // 			}
+			        // 		} else {
+			        // 			$amount_left += ($credit['nominal_peminjaman'] / $credit['durasi']);
+			        // 		}
+			        // 	} else {
+			        // 		if($current_period == 0){
+		        	// 			if($value['id_status_bayar'] == 1){
+		        	// 				$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
+		        	// 				if($value['nominal_denda'] > 0){
+		        	// 					$get_late_penalty = 1;
+		        	// 				}
+		        	// 			} else {
+		        	// 				if($value['nominal_denda_dibayar'] != null && $value['nominal_denda_dibayar'] > 0 ){
+		        	// 					$get_late_penalty = 1;
+		        	// 				}
+		        	// 			}
+		        	// 			if(strtotime(date("Y-m-d")) < strtotime($value['tanggal_jatuh_tempo'])){
+		        	// 				$current_period = 1;
+			        // 			}
+			        // 		} else {
+			        // 			$amount_left += $credit['nominal_pencicilan'];
+			        // 		}
+			        // 	}
+		        	// }
     			}
 
-    			//final_pelunasan_calculation
-    			if($credit['id_status_peminjaman'] == 1){
-	    			if($credit['id_jenis_peminjaman'] == 1){
-		    			$response['direct_payment_amount'] = $last_amount + $amount_left + $amount_left * $peminjaman_jenis['besar_pinalti_langsung_lunas'];
-		    		} else {
-		    			$response['direct_payment_amount'] = $last_amount + $amount_left;
-		    			if ($get_late_penalty == 0){
-			    			$response['direct_payment_amount'] -= $credit['nominal_tabungan_ditahan'];
-			    		}
-		    		}
-		    	} else {
-		    		$response['direct_payment_amount'] = 0;
-		    	}
+    			// //final_pelunasan_calculation
+    			// if($credit['id_status_peminjaman'] == 1){
+	    		// 	if($credit['id_jenis_peminjaman'] == 1){
+		    	// 		$response['direct_payment_amount'] = $last_amount + $amount_left + $amount_left * $peminjaman_jenis['besar_pinalti_langsung_lunas'];
+		    	// 	} else {
+		    	// 		$response['direct_payment_amount'] = $last_amount + $amount_left;
+		    	// 		if ($get_late_penalty == 0){
+			    // 			$response['direct_payment_amount'] -= $credit['nominal_tabungan_ditahan'];
+			    // 		}
+		    	// 	}
+		    	// } else {
+		    	// 	$response['direct_payment_amount'] = 0;
+		    	// }
+
+    			
+	            //lunas dipercepat jamina	
+    			$totalCicilan = Pencicilan::getTotalCicilan($credit['id']);
+	            $response['direct_payment_amount'] = Pencicilan::getLunasDipercepat($credit['id_jenis_peminjaman'], $totalCicilan, $credit['durasi'], $credit['nominal_peminjaman'], $peminjaman_jenis['besar_pinalti_langsung_lunas']);
+		        
         		$response['bill'] = $bills;
 	        	$response['message'] = 'Berhasil mengambil data';
 	            $response['status'] = 1;
