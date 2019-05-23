@@ -103,13 +103,9 @@ class Pencicilan extends \yii\db\ActiveRecord
 
     public function getTotalCicilan($id_peminjaman)
     {
-        $data = Pencicilan::find()->select('count(id_peminjaman) as total')->groupBy('id_peminjaman')->where(['id_peminjaman'=>$id_peminjaman])->andWhere(['id_status_bayar'=>2])->asArray()->all();
-        $cicilan = [];
-        foreach ($data as $key => $value) {
-            $cicilan = (int)$value['total'];
-        }
+        $data = Pencicilan::find()->select('count(id_peminjaman) as total')->where(['id_peminjaman'=>$id_peminjaman])->andWhere(['id_status_bayar'=>2])->asArray()->all();
 
-        return json_encode($cicilan);
+        return $data['total'];
     }
 
     public function getLunasDipercepat($id_jenis_peminjaman,$totalCicilan,$durasi,$nominal_peminjaman, $besar_pinalti_langsung_lunas)
