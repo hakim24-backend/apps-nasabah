@@ -444,6 +444,7 @@ class ApiController extends \yii\rest\Controller
             
             $nasabah = Nasabah::find()->where(['id'=>$param['customer_id']])->one();
             if ($nasabah) {
+            	$akun = Akun::find()->where(['id'=>$nasabah->id_akun])->one();
             	if ($nasabah->validatePassword($param['password'], $akun->password_hash)) {
 	            	$transaction = Yii::$app->db->beginTransaction();
 	                try{
