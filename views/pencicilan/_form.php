@@ -118,23 +118,13 @@ $this->registerJs("
         var cicilan_denda = BigInt(cicilan_fix)+BigInt(denda_fix);
         var cicilan_lunas_denda = BigInt(cicilan_lunas_fix)+BigInt(denda_fix);
         
-        if(id == 1){
-            if(BigInt(cicilan_denda) == BigInt(nominal_fix)){
-                return true;
-            } else {
-                alert('Harus Sesuai Dana Cicilan + Denda');
-                $('#pencicilan-nominal_cicilan-disp').focus();
-                return false;
-            }
-        } else {
-            if(BigInt(cicilan_lunas_denda) == BigInt(nominal_fix)){
-                return true;
-            } else {
-                alert('Harus Sesuai Dana Langsung Lunas + Denda');
-                $('#pencicilan-nominal_cicilan-disp').focus();
-                return false;
-            }
-        }
+        $.ajax({
+          url : '" . Yii::$app->urlManager->baseUrl."/pencicilan/get-nominal-cicilan?id='+id,
+          dataType : 'html',
+          success: function (data) {
+            $('#durasi').html(data);
+          }
+        })
 
     });
  

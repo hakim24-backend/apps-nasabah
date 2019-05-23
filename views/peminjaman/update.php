@@ -46,7 +46,8 @@ use kartik\select2\Select2;
             <?= $form->field($model, 'nominal_peminjaman')->widget(MaskMoney::classname(), 
               [
                 'options' => [
-                    'required'=>true
+                    'required'=>true,
+                    'disabled' => true
                 ],
                 'pluginOptions' => [
                     'prefix' => 'Rp. ',
@@ -74,17 +75,17 @@ use kartik\select2\Select2;
 
             <div id="jaminan">
                 <?php if ($model->id_jenis_peminjaman == 1) { ?>
-                    <?= $form->field($model, 'jaminan')->textInput(['maxlength' => true,'required'=>true]) ?>
+                    <?= $form->field($model, 'jaminan')->textInput(['maxlength' => true,'required'=>true,'disabled'=>true]) ?>
                 <?php } else { ?>
                     <!-- no form -->
                 <?php } ?>
             </div>
 
             <label>Jenis Durasi</label>
-            <?= Html::dropDownlist('jenis-durasi',$model->id_jenis_durasi,[1=>'Mingguan',2=>'Bulanan'], ['prompt' => 'Pilih Jenis Durasi...', 'required' => true, 'class' => 'form-control', 'id' => 'jenis-durasi', 'style' => 'width: 100%']) ?>
+            <?= Html::dropDownlist('jenis-durasi',$model->id_jenis_durasi,[1=>'Mingguan',2=>'Bulanan'], ['prompt' => 'Pilih Jenis Durasi...', 'required' => true,'disabled'=>true, 'class' => 'form-control', 'id' => 'jenis-durasi', 'style' => 'width: 100%']) ?>
             <br>
 
-            <?= $form->field($model, 'durasi')->textInput(['maxlength' => true,'required' => true]) ?>
+            <?= $form->field($model, 'durasi')->textInput(['maxlength' => true,'required' => true,'disabled'=>true]) ?>
 
             <?php
 		        echo FileInput::widget([
