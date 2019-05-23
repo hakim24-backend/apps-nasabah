@@ -458,7 +458,7 @@ class ApiController extends \yii\rest\Controller
 		            		$riwayat_nomor_telepon = new NasabahRiwayatNomorTelepon();
 		                	$riwayat_nomor_telepon->id_nasabah = $nasabah->id;
 		                	$riwayat_nomor_telepon->nomor_telepon = $nasabah->nomor_telepon;
-		                	$riwayat_nomor_telepon->tanggal_waktu_pembuatan = $akun->tanggal_waktu_pembuatan;
+		                	$riwayat_nomor_telepon->tanggal_waktu_pembuatan = date('Y-m-d H:i:s');
 
 		                	if($riwayat_nomor_telepon->save(false)){
 		                		$response['message'] = 'Berhasil mengupdate nomor telepon';
