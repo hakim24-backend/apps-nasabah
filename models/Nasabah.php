@@ -15,6 +15,7 @@ use Yii;
  * @property string $tanggal_lahir
  * @property string $jenis_kelamin
  * @property string $nomor_telepon
+ * @property string $nomor_kartu_sim
  * @property string $email
  * @property string $foto_ktp
  * @property string $foto_bersama_ktp
@@ -48,6 +49,7 @@ class Nasabah extends \yii\db\ActiveRecord
             [['nama', 'alamat', 'tempat_lahir', 'email'], 'string', 'max' => 100],
             [['jenis_kelamin'], 'string', 'max' => 15],
             [['nomor_telepon'], 'string', 'max' => 20],
+            [['nomor_kartu_sim'], 'string', 'max' => 100],
             [['foto_ktp'], 'file', 'extensions' => 'jpg, png, jpeg'],
             [['foto_ktp', 'foto_bersama_ktp', 'access_token'], 'string', 'max' => 255],
             [['id_akun'], 'exist', 'skipOnError' => true, 'targetClass' => Akun::className(), 'targetAttribute' => ['id_akun' => 'id']],
@@ -69,6 +71,7 @@ class Nasabah extends \yii\db\ActiveRecord
             'tanggal_lahir' => 'Tanggal Lahir',
             'jenis_kelamin' => 'Jenis Kelamin',
             'nomor_telepon' => 'Nomor Telepon',
+            'nomor_kartu_sim' => 'Nomor Kartu Sim',
             'email' => 'Email',
             'foto_ktp' => 'Foto Ktp',
             'foto_bersama_ktp' => 'Foto Bersama Ktp',

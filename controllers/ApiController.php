@@ -13,6 +13,7 @@ use app\models\Pengguna;
 use app\models\Pencicilan;
 use app\models\PencicilanJenis;
 use app\models\PencicilanStatusBayar;
+use app\models\NasabahRiwayatNomorTelepon;
 use Yii;
 
 class ApiController extends \yii\rest\Controller
@@ -71,39 +72,43 @@ class ApiController extends \yii\rest\Controller
 
 	                    if($nasabah->save(false)){
 
-	                        if($nasabah->save(false)){
+	                    	$riwayat_nomor_telepon = new NasabahRiwayatNomorTelepon();
+	                    	$riwayat_nomor_telepon->id_nasabah = $nasabah->id;
+	                    	$riwayat_nomor_telepon->nomor_telepon = $nasabah->nomor_telepon;
+	                    	$riwayat_nomor_telepon->tanggal_waktu_pembuatan = $akun->tanggal_waktu_pembuatan;
 
-								$email = \Yii::$app->mailer->compose('index', ['access_token'=>$akun->access_token])
-	                                ->setTo($nasabah->email)
-	                                ->setFrom(['mamorasoft.firebase@gmail.com'])
-	                                ->setSubject('Konfirmasi Pendaftaran')
-	                                ->send();
+	                    	$riwayat_nomor_telepon->save(false);
 
-	                            if ($email){
-	                            	$extension = $this->getFileExtension($param['ktp']['name']);
-			                        $name = "ktp-".$nasabah->id."-".time(). '.' . $extension;
-			                        $filedest = 'foto/' . $name;
-			                        move_uploaded_file($param['ktp']['tmp_name'], $filedest);
-			                        $nasabah->foto_ktp = $name;
+							$email = \Yii::$app->mailer->compose('index', ['access_token'=>$akun->access_token])
+                                ->setTo($nasabah->email)
+                                ->setFrom(['mamorasoft.firebase@gmail.com'])
+                                ->setSubject('Konfirmasi Pendaftaran')
+                                ->send();
 
-			                        $extension = $this->getFileExtension($param['with_ktp']['name']);
-			                        $name = "with_ktp-".$nasabah->id."-".time(). '.' . $extension;
-			                        $filedest = 'foto/' . $name;
-			                        move_uploaded_file($param['with_ktp']['tmp_name'], $filedest);
-			                        $nasabah->foto_bersama_ktp = $name;
+                            if ($email){
+                            	$extension = $this->getFileExtension($param['ktp']['name']);
+		                        $name = "ktp-".$nasabah->id."-".time(). '.' . $extension;
+		                        $filedest = 'foto/' . $name;
+		                        move_uploaded_file($param['ktp']['tmp_name'], $filedest);
+		                        $nasabah->foto_ktp = $name;
 
-			                        $nasabah->save(false);
+		                        $extension = $this->getFileExtension($param['with_ktp']['name']);
+		                        $name = "with_ktp-".$nasabah->id."-".time(). '.' . $extension;
+		                        $filedest = 'foto/' . $name;
+		                        move_uploaded_file($param['with_ktp']['tmp_name'], $filedest);
+		                        $nasabah->foto_bersama_ktp = $name;
 
-	                            	$response['message'] = "Registrasi berhasil";
-			                        $response['status'] = 1;
-			                        $response['customer_id'] = $nasabah->id;
-		                        	$transaction->commit();
-		                    	} else {
-		                    		$transaction->rollBack();
-				                    $response['message'] = "Gagal mengirim email konfirmasi";
-				                    $response['status'] = 0;
-		                    	}
-		                    }
+		                        $nasabah->save(false);
+
+                            	$response['message'] = "Registrasi berhasil";
+		                        $response['status'] = 1;
+		                        $response['customer_id'] = $nasabah->id;
+	                        	$transaction->commit();
+	                    	} else {
+	                    		$transaction->rollBack();
+			                    $response['message'] = "Gagal mengirim email konfirmasi";
+			                    $response['status'] = 0;
+	                    	}
                            
 	                    }
 	                }
@@ -247,7 +252,7 @@ class ApiController extends \yii\rest\Controller
 
             if ($customer) {
 
-            	$credit = Peminjaman::find()->where(['id_nasabah'=>$param['customer_id']])->asArray()->all();
+            	$credit = Peminjaman::find()->where(['id_nasabah'=>$param['customer_id']])->orderBy(['tanggal_waktu_pembuatan'=>SORT_DESC])->asArray()->all();
 
 	        	if ($credit) {
 
@@ -321,11 +326,11 @@ class ApiController extends \yii\rest\Controller
         		$get_late_penalty = 0;
         		$current_period = 0;
     			$bills = Pencicilan::find()->where(['id_peminjaman'=>$credit['id']])->orderBy(['periode'=>SORT_ASC])->asArray()->all();
+    			$peminjaman_jenis = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->asArray()->one();
 
     			foreach ($bills as $key => $value) {
 					//denda
 					if($value['id_status_bayar'] == 1) {
-						$peminjaman_jenis = PeminjamanJenis::find()->where(['id'=>$credit['id_jenis_peminjaman']])->asArray()->one();
 	        			// $value['nominal_denda'] = Peminjaman::getDenda($credit['id_jenis_durasi'], $value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
 	        			$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
 	        		} else {
@@ -361,53 +366,59 @@ class ApiController extends \yii\rest\Controller
         			$bills[$key] = $value;
 
         			//pre_pelunasan_calculation
-        			if($credit['id_status_peminjaman'] == 1){
-        				if($credit['id_jenis_peminjaman'] == 1){
-		        			if($current_period == 0){
-		        				if($value['id_status_bayar'] == 1){
-		        					$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
-		        				}
-		        				if(strtotime(date("Y-m-d")) < strtotime($value['tanggal_jatuh_tempo'])){
-		        					$current_period = 1;
-			        			}
-			        		} else {
-			        			$amount_left += ($credit['nominal_peminjaman'] / $credit['durasi']);
-			        		}
-			        	} else {
-			        		if($current_period == 0){
-		        				if($value['id_status_bayar'] == 1){
-		        					$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
-		        					if($value['nominal_denda'] > 0){
-		        						$get_late_penalty = 1;
-		        					}
-		        				} else {
-		        					if($value['nominal_denda_dibayar'] != null && $value['nominal_denda_dibayar'] > 0 ){
-		        						$get_late_penalty = 1;
-		        					}
-		        				}
-		        				if(strtotime(date("Y-m-d")) < strtotime($value['tanggal_jatuh_tempo'])){
-		        					$current_period = 1;
-			        			}
-			        		} else {
-			        			$amount_left += $credit['nominal_pencicilan'];
-			        		}
-			        	}
-		        	}
+        			// if($credit['id_status_peminjaman'] == 1){
+        			// 	if($credit['id_jenis_peminjaman'] == 1){
+		        	// 		if($current_period == 0){
+		        	// 			if($value['id_status_bayar'] == 1){
+		        	// 				$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
+		        	// 			}
+		        	// 			if(strtotime(date("Y-m-d")) < strtotime($value['tanggal_jatuh_tempo'])){
+		        	// 				$current_period = 1;
+			        // 			}
+			        // 		} else {
+			        // 			$amount_left += ($credit['nominal_peminjaman'] / $credit['durasi']);
+			        // 		}
+			        // 	} else {
+			        // 		if($current_period == 0){
+		        	// 			if($value['id_status_bayar'] == 1){
+		        	// 				$last_amount += ($credit['nominal_pencicilan'] + $value['nominal_denda']);
+		        	// 				if($value['nominal_denda'] > 0){
+		        	// 					$get_late_penalty = 1;
+		        	// 				}
+		        	// 			} else {
+		        	// 				if($value['nominal_denda_dibayar'] != null && $value['nominal_denda_dibayar'] > 0 ){
+		        	// 					$get_late_penalty = 1;
+		        	// 				}
+		        	// 			}
+		        	// 			if(strtotime(date("Y-m-d")) < strtotime($value['tanggal_jatuh_tempo'])){
+		        	// 				$current_period = 1;
+			        // 			}
+			        // 		} else {
+			        // 			$amount_left += $credit['nominal_pencicilan'];
+			        // 		}
+			        // 	}
+		        	// }
     			}
 
-    			//final_pelunasan_calculation
-    			if($credit['id_status_peminjaman'] == 1){
-	    			if($credit['id_jenis_peminjaman'] == 1){
-		    			$response['direct_payment_amount'] = $last_amount + $amount_left + $amount_left * $peminjaman_jenis['besar_pinalti_langsung_lunas'];
-		    		} else {
-		    			$response['direct_payment_amount'] = $last_amount + $amount_left;
-		    			if ($get_late_penalty == 0){
-			    			$response['direct_payment_amount'] -= $credit['nominal_tabungan_ditahan'];
-			    		}
-		    		}
-		    	} else {
-		    		$response['direct_payment_amount'] = 0;
-		    	}
+    			// //final_pelunasan_calculation
+    			// if($credit['id_status_peminjaman'] == 1){
+	    		// 	if($credit['id_jenis_peminjaman'] == 1){
+		    	// 		$response['direct_payment_amount'] = $last_amount + $amount_left + $amount_left * $peminjaman_jenis['besar_pinalti_langsung_lunas'];
+		    	// 	} else {
+		    	// 		$response['direct_payment_amount'] = $last_amount + $amount_left;
+		    	// 		if ($get_late_penalty == 0){
+			    // 			$response['direct_payment_amount'] -= $credit['nominal_tabungan_ditahan'];
+			    // 		}
+		    	// 	}
+		    	// } else {
+		    	// 	$response['direct_payment_amount'] = 0;
+		    	// }
+
+    			
+	            //lunas dipercepat jamina	
+    			$totalCicilan = Pencicilan::getTotalCicilan($credit['id']);
+	            $response['direct_payment_amount'] = Pencicilan::getLunasDipercepat($credit['id_jenis_peminjaman'], $totalCicilan, $credit['durasi'], $credit['nominal_peminjaman'], $peminjaman_jenis['besar_pinalti_langsung_lunas']);
+		        
         		$response['bill'] = $bills;
 	        	$response['message'] = 'Berhasil mengambil data';
 	            $response['status'] = 1;
@@ -422,6 +433,76 @@ class ApiController extends \yii\rest\Controller
         }
 
         return $response; 
+    }
+
+    public function actionUpdatePhoneNumber()
+    {
+        $param=\Yii::$app->request->post();
+
+        $response= array();
+        if ($param['customer_id']!="" && $param['phone_number']!="") {
+            
+            $nasabah = Nasabah::find()->where(['id'=>$param['customer_id']])->one();
+            if ($nasabah) {
+            	$transaction = Yii::$app->db->beginTransaction();
+                try{
+	            	$nasabah->nomor_telepon = $param['phone_number'];
+	            	if($nasabah->save(false)){
+	            		$riwayat_nomor_telepon = new NasabahRiwayatNomorTelepon();
+	                	$riwayat_nomor_telepon->id_nasabah = $nasabah->id;
+	                	$riwayat_nomor_telepon->nomor_telepon = $nasabah->nomor_telepon;
+	                	$riwayat_nomor_telepon->tanggal_waktu_pembuatan = $akun->tanggal_waktu_pembuatan;
+
+	                	if($riwayat_nomor_telepon->save(false)){
+	                		$response['message'] = 'Berhasil mengupdate nomor kartu sim';
+	            			$response['status'] = 1;
+	                	}
+
+	            	}
+	            } catch (\Exception $e) {
+                    $transaction->rollBack();
+                    $response['message'] = "Gagal mengupdate nomor telepon";
+                    $response['status'] = 0;
+                }
+            }else{
+                $response['message'] = 'Nasabah tidak ditemukan';
+            	$response['status'] = 0;
+            }
+        }else{
+            $response['message'] = 'Data tidak boleh kosong';
+            $response['status'] = 0;
+        }
+
+        return $response;
+    }
+
+    public function actionUpdateSimNumber()
+    {
+        $param=\Yii::$app->request->post();
+
+        $response= array();
+        if ($param['customer_id']!="" && $param['sim_number']!="") {
+            
+            $nasabah = Nasabah::find()->where(['id'=>$param['customer_id']])->one();
+            if ($nasabah) {
+            	$nasabah->nomor_kartu_sim = $param['sim_number'];
+            	if($nasabah->save(false)){
+            		$response['message'] = 'Berhasil mengupdate nomor kartu sim';
+            		$response['status'] = 1;
+            	} else {
+            		$response['message'] = 'Gagal mengupdate nomor kartu sim';
+            		$response['status'] = 0;
+            	}
+            }else{
+                $response['message'] = 'Nasabah tidak ditemukan';
+            	$response['status'] = 0;
+            }
+        }else{
+            $response['message'] = 'Data tidak boleh kosong';
+            $response['status'] = 0;
+        }
+
+        return $response;
     }
 
     function getFileExtension($file)
