@@ -76,7 +76,7 @@ function to_rp($val)
             <?= Html::dropDownlist('cicilan',0,[1=>'Sesuai Durasi',2=>'Langsung Lunas'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>
             <br>
 
-            <?php
+            <!-- <?php
             echo $form->field($model, 'nominal_cicilan')->widget(MaskMoney::classname(), [
                 'pluginOptions' => [
                 'prefix' => 'Rp ',
@@ -88,7 +88,7 @@ function to_rp($val)
                     'required'=>'required'
                 ]
             ]);
-            ?>
+            ?> -->
 
             <div class="form-group">
                 <?= Html::submitButton('Save', ['class' => 'btn btn-success btn-save']) ?>
@@ -118,23 +118,7 @@ $this->registerJs("
         var cicilan_denda = BigInt(cicilan_fix)+BigInt(denda_fix);
         var cicilan_lunas_denda = BigInt(cicilan_lunas_fix)+BigInt(denda_fix);
         
-        if(id == 1){
-            if(BigInt(cicilan_denda) == BigInt(nominal_fix)){
-                return true;
-            } else {
-                alert('Harus Sesuai Dana Cicilan + Denda');
-                $('#pencicilan-nominal_cicilan-disp').focus();
-                return false;
-            }
-        } else {
-            if(BigInt(cicilan_lunas_denda) == BigInt(nominal_fix)){
-                return true;
-            } else {
-                alert('Harus Sesuai Dana Langsung Lunas + Denda');
-                $('#pencicilan-nominal_cicilan-disp').focus();
-                return false;
-            }
-        }
+        
 
     });
  
