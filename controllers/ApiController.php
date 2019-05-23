@@ -13,6 +13,7 @@ use app\models\Pengguna;
 use app\models\Pencicilan;
 use app\models\PencicilanJenis;
 use app\models\PencicilanStatusBayar;
+use app\models\NasabahRiwayatNomorTelepon;
 use Yii;
 
 class ApiController extends \yii\rest\Controller
@@ -71,39 +72,43 @@ class ApiController extends \yii\rest\Controller
 
 	                    if($nasabah->save(false)){
 
-	                        if($nasabah->save(false)){
+	                    	$riwayat_nomor_telepon = new NasabahRiwayatNomorTelepon();
+	                    	$riwayat_nomor_telepon->id_nasabah = $nasabah->id;
+	                    	$riwayat_nomor_telepon->nomor_telepon = $nasabah->nomor_telepon;
+	                    	$riwayat_nomor_telepon->tanggal_waktu_pembuatan = $akun->tanggal_waktu_pembuatan;
 
-								$email = \Yii::$app->mailer->compose('index', ['access_token'=>$akun->access_token])
-	                                ->setTo($nasabah->email)
-	                                ->setFrom(['mamorasoft.firebase@gmail.com'])
-	                                ->setSubject('Konfirmasi Pendaftaran')
-	                                ->send();
+	                    	$riwayat_nomor_telepon->save(false);
 
-	                            if ($email){
-	                            	$extension = $this->getFileExtension($param['ktp']['name']);
-			                        $name = "ktp-".$nasabah->id."-".time(). '.' . $extension;
-			                        $filedest = 'foto/' . $name;
-			                        move_uploaded_file($param['ktp']['tmp_name'], $filedest);
-			                        $nasabah->foto_ktp = $name;
+							$email = \Yii::$app->mailer->compose('index', ['access_token'=>$akun->access_token])
+                                ->setTo($nasabah->email)
+                                ->setFrom(['mamorasoft.firebase@gmail.com'])
+                                ->setSubject('Konfirmasi Pendaftaran')
+                                ->send();
 
-			                        $extension = $this->getFileExtension($param['with_ktp']['name']);
-			                        $name = "with_ktp-".$nasabah->id."-".time(). '.' . $extension;
-			                        $filedest = 'foto/' . $name;
-			                        move_uploaded_file($param['with_ktp']['tmp_name'], $filedest);
-			                        $nasabah->foto_bersama_ktp = $name;
+                            if ($email){
+                            	$extension = $this->getFileExtension($param['ktp']['name']);
+		                        $name = "ktp-".$nasabah->id."-".time(). '.' . $extension;
+		                        $filedest = 'foto/' . $name;
+		                        move_uploaded_file($param['ktp']['tmp_name'], $filedest);
+		                        $nasabah->foto_ktp = $name;
 
-			                        $nasabah->save(false);
+		                        $extension = $this->getFileExtension($param['with_ktp']['name']);
+		                        $name = "with_ktp-".$nasabah->id."-".time(). '.' . $extension;
+		                        $filedest = 'foto/' . $name;
+		                        move_uploaded_file($param['with_ktp']['tmp_name'], $filedest);
+		                        $nasabah->foto_bersama_ktp = $name;
 
-	                            	$response['message'] = "Registrasi berhasil";
-			                        $response['status'] = 1;
-			                        $response['customer_id'] = $nasabah->id;
-		                        	$transaction->commit();
-		                    	} else {
-		                    		$transaction->rollBack();
-				                    $response['message'] = "Gagal mengirim email konfirmasi";
-				                    $response['status'] = 0;
-		                    	}
-		                    }
+		                        $nasabah->save(false);
+
+                            	$response['message'] = "Registrasi berhasil";
+		                        $response['status'] = 1;
+		                        $response['customer_id'] = $nasabah->id;
+	                        	$transaction->commit();
+	                    	} else {
+	                    		$transaction->rollBack();
+			                    $response['message'] = "Gagal mengirim email konfirmasi";
+			                    $response['status'] = 0;
+	                    	}
                            
 	                    }
 	                }
@@ -428,6 +433,76 @@ class ApiController extends \yii\rest\Controller
         }
 
         return $response; 
+    }
+
+    public function actionUpdatePhoneNumber()
+    {
+        $param=\Yii::$app->request->post();
+
+        $response= array();
+        if ($param['customer_id']!="" && $param['phone_number']!="") {
+            
+            $nasabah = Nasabah::find()->where(['id'=>$param['customer_id']])->one();
+            if ($nasabah) {
+            	$transaction = Yii::$app->db->beginTransaction();
+                try{
+	            	$nasabah->nomor_telepon = $param['phone_number'];
+	            	if($nasabah->save(false)){
+	            		$riwayat_nomor_telepon = new NasabahRiwayatNomorTelepon();
+	                	$riwayat_nomor_telepon->id_nasabah = $nasabah->id;
+	                	$riwayat_nomor_telepon->nomor_telepon = $nasabah->nomor_telepon;
+	                	$riwayat_nomor_telepon->tanggal_waktu_pembuatan = $akun->tanggal_waktu_pembuatan;
+
+	                	if($riwayat_nomor_telepon->save(false)){
+	                		$response['message'] = 'Berhasil mengupdate nomor kartu sim';
+	            			$response['status'] = 1;
+	                	}
+
+	            	}
+	            } catch (\Exception $e) {
+                    $transaction->rollBack();
+                    $response['message'] = "Gagal mengupdate nomor telepon";
+                    $response['status'] = 0;
+                }
+            }else{
+                $response['message'] = 'Nasabah tidak ditemukan';
+            	$response['status'] = 0;
+            }
+        }else{
+            $response['message'] = 'Data tidak boleh kosong';
+            $response['status'] = 0;
+        }
+
+        return $response;
+    }
+
+    public function actionUpdateSimNumber()
+    {
+        $param=\Yii::$app->request->post();
+
+        $response= array();
+        if ($param['customer_id']!="" && $param['sim_number']!="") {
+            
+            $nasabah = Nasabah::find()->where(['id'=>$param['customer_id']])->one();
+            if ($nasabah) {
+            	$nasabah->nomor_kartu_sim = $param['sim_number'];
+            	if($nasabah->save(false)){
+            		$response['message'] = 'Berhasil mengupdate nomor kartu sim';
+            		$response['status'] = 1;
+            	} else {
+            		$response['message'] = 'Gagal mengupdate nomor kartu sim';
+            		$response['status'] = 0;
+            	}
+            }else{
+                $response['message'] = 'Nasabah tidak ditemukan';
+            	$response['status'] = 0;
+            }
+        }else{
+            $response['message'] = 'Data tidak boleh kosong';
+            $response['status'] = 0;
+        }
+
+        return $response;
     }
 
     function getFileExtension($file)
