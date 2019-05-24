@@ -118,7 +118,7 @@ class PencicilanController extends Controller
         $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman, $jenisPeminjaman->besar_pinalti_langsung_lunas, $peminjaman->nominal_pencicilan, $peminjaman->id, $peminjaman->nominal_tabungan_ditahan);
         $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
 
-        if ($model->load(Yii::$app->request->post())) {
+        if ((Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
 
             if ($post['cicilan'] == 2) {
@@ -134,6 +134,9 @@ class PencicilanController extends Controller
                     $value->save(false);
                 }
 
+                $nominal_lunas = str_ireplace('.', '', $post['nominal_lunas']);
+                $nominal_lunas = str_ireplace('Rp ', '', $nominal_lunas);
+                $model->nominal_cicilan = $nominal_lunas;
                 $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
                 $model->id_jenis_pencicilan = $post['cicilan'];
                 $model->nominal_denda_dibayar = $denda;
@@ -143,6 +146,9 @@ class PencicilanController extends Controller
                 return $this->redirect(['pencicilan/index']);
             } else {
                 $model->id_status_bayar = 2;
+                $nominal_sesuai_durasi = str_ireplace('.', '', $post['nominal_sesuai_durasi']);
+                $nominal_sesuai_durasi = str_ireplace('Rp ', '', $nominal_sesuai_durasi);
+                $model->nominal_cicilan = $nominal_sesuai_durasi;
                 $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
                 $model->id_jenis_pencicilan = $post['cicilan'];
                 $model->nominal_denda_dibayar = $denda;
@@ -248,6 +254,35 @@ class PencicilanController extends Controller
             'denda' => $denda,
             'cicilanDenda' => $cicilanDenda
         ]);
+    }
+
+    public function actionGetNominalCicilan($id,$cicilan_denda,$cicilan_lunas_denda)
+    {
+        
+        function to_rp($val)
+        {
+            return "Rp " . number_format($val,0,',','.');
+        }
+        if ($id == 1) {
+            echo '
+                <label>Nominal Cicilan</label>
+                <input type="text" readonly id="nominal_sesuai_durasi" class="form-control" name="nominal_sesuai_durasi" value="'.to_rp($cicilan_denda).'"><br>
+            ';
+        } elseif ($id == 2) {
+            echo '
+                <label>Nominal Cicilan</label>
+                <input type="text" readonly id="nominal_lunas" class="form-control" name="nominal_lunas" value="'.to_rp($cicilan_lunas_denda).'"><br>
+            ';
+        } 
+        // elseif ($id == 3) {
+        //     echo '
+        //         <label>Nominal Cicilan</label>
+        //         <input type="text" id="nominal_lainnya" class="form-control" name="nominal_lainnya"><br>
+        //     ';
+        // } 
+        else {
+            echo '';
+        }
     }
 
     /**

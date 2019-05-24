@@ -76,22 +76,11 @@ function to_rp($val)
             <?= Html::dropDownlist('cicilan',0,[1=>'Sesuai Durasi',2=>'Langsung Lunas'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>
             <br>
 
-            <?php
-            echo $form->field($model, 'nominal_cicilan')->widget(MaskMoney::classname(), [
-                'pluginOptions' => [
-                'prefix' => 'Rp ',
-                'thousands' => '.',
-                'decimal' => ',',
-                'precision' => 0
-                ],
-                'options' => [
-                    'required'=>'required'
-                ]
-            ]);
-            ?>
+            <div id="nominal">
+            </div>
 
             <div class="form-group">
-                <?= Html::submitButton('Save', ['class' => 'btn btn-success btn-save']) ?>
+                <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
                 <a class="btn btn-danger" href="<?= Url::to(Yii::$app->request->referrer);?>">Kembali</a>
             </div>
 
@@ -105,12 +94,10 @@ function to_rp($val)
   
 $this->registerJs("
 
-    $('.btn-save').on('click',function(){
+    $('#cicilan').on('click',function(){
         var id = $('#cicilan').val();
         var denda = $('#denda').text();
         var denda_fix = denda.replace('Rp ','').replace(/\./g,'');
-        var nominal = $('#pencicilan-nominal_cicilan-disp').val();
-        var nominal_fix  = nominal.replace('Rp ','').replace(/\./g,'');
         var cicilan = $('#cicilan-bulan').text();
         var cicilan_fix  = cicilan.replace('Rp ','').replace(/\./g,'');
         var cicilan_lunas = $('#cicilan-lunas').text();
@@ -119,10 +106,10 @@ $this->registerJs("
         var cicilan_lunas_denda = BigInt(cicilan_lunas_fix)+BigInt(denda_fix);
         
         $.ajax({
-          url : '" . Yii::$app->urlManager->baseUrl."/pencicilan/get-nominal-cicilan?id='+id,
+          url : '" . Yii::$app->urlManager->baseUrl."/pencicilan/get-nominal-cicilan?id='+id+'&cicilan_denda='+cicilan_denda+'&cicilan_lunas_denda='+cicilan_lunas_denda,
           dataType : 'html',
           success: function (data) {
-            $('#durasi').html(data);
+            $('#nominal').html(data);
           }
         })
 
