@@ -154,15 +154,6 @@ class PencicilanController extends Controller
                 $model->nominal_denda_dibayar = $denda;
                 $model->save(false);
 
-                $dataLunas = Pencicilan::find()->where(['id_peminjaman'=>$peminjaman->id])->all();
-
-                // foreach ($dataLunas as $value) {
-                //     $data = Pencicilan::find()->where(['id_status_bayar'=>2])->all();
-                //     var_dump($data);
-                // }
-
-                // die();
-
                 Yii::$app->session->setFlash('success', "Tambah Data Cicilan Nasabah Berhasil");
                 return $this->redirect(['pencicilan/cicilan/','id'=>$model->id_peminjaman]);
             }
