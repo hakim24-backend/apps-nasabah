@@ -2,6 +2,9 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use app\models\PeminjamanSearch;
+use kartik\select2\Select2;
+use kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\PeminjamanSearch */
@@ -18,6 +21,7 @@ function to_rp($val)
 
     <p>
         <?= Html::a('Tambah Data Peminjaman', ['create'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Reset Filter', ['index'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <div class="box box-info">
@@ -33,7 +37,23 @@ function to_rp($val)
                     // 'id',
                     // 'id_nasabah',
                     // 'id_jenis_peminjaman',
-                    'nomor_kontrak',
+                    // 'nomor_kontrak',
+                    [
+                        'attribute' => 'tanggal_waktu_pembuatan',
+                        'filter' => DatePicker::widget([
+                                        'model' => $searchModel, 
+                                        'attribute' => 'tanggal_waktu_pembuatan',
+                                        'options' => ['placeholder' => 'Pilih Tanggal ...'],
+                                        'pluginOptions' => [
+                                            'autoclose'=>true,
+                                            'format' => 'yyyy-mm-dd'
+                                        ]
+                                    ]),
+                        'value'=>function($model){
+                            $date=date_create($model->tanggal_waktu_pembuatan);
+                            return date_format($date, 'd F y');
+                        }
+                    ],
                     // 'nik_ktp',
                     'nama',
                     // 'alamat',
@@ -46,9 +66,9 @@ function to_rp($val)
                     //'id_jenis_durasi',
                     //'durasi',
                     //'jaminan',
-                    // 'tanggal_waktu_pembuatan',
                     [
                     'attribute' => 'id_status_peminjaman',
+                    'filter' => Html::dropDownlist('PeminjamanSearch[id_status_peminjaman]',null,[1=>'Belum Lunas', 2=>'Lunas'], ['prompt' => 'Pilih Status', 'required' => true, 'class' => 'form-control', 'id' => 'status', 'style' => 'width: 100%']),
                     'format' => 'raw',
                     'value' => function($model){
                         if ($model->id_status_peminjaman == 1) {

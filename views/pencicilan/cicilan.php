@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\GridView;
 use app\models\Pencicilan;
+use kartik\date\DatePicker;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\PencicilanSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -77,6 +78,15 @@ function to_rp($val)
                     ],
                     [
                     'attribute' => 'tanggal_waktu_cicilan',
+                    'filter' => DatePicker::widget([
+                                        'model' => $searchModel, 
+                                        'attribute' => 'tanggal_waktu_cicilan',
+                                        'options' => ['placeholder' => 'Pilih Tanggal ...'],
+                                        'pluginOptions' => [
+                                            'autoclose'=>true,
+                                            'format' => 'yyyy-mm-dd'
+                                        ]
+                                    ]),
                     'value' => function($model){
                         if ($model->tanggal_waktu_cicilan == null) {
                             return 'Belum ada';
