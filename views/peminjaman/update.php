@@ -74,11 +74,7 @@ use kartik\select2\Select2;
             </div>
 
             <div id="jaminan">
-                <?php if ($model->id_jenis_peminjaman == 1) { ?>
-                    <?= $form->field($model, 'jaminan')->textInput(['maxlength' => true,'required'=>true,'disabled'=>true]) ?>
-                <?php } else { ?>
-                    <!-- no form -->
-                <?php } ?>
+                <?= $form->field($model, 'jaminan')->textInput(['maxlength' => true,'required'=>true,'disabled'=>true]) ?>
             </div>
 
             <label>Jenis Durasi</label>

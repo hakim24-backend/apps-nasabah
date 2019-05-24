@@ -132,7 +132,7 @@ class PeminjamanController extends Controller
                     $model->nominal_tabungan_ditahan = $tabunganDitahan;
                     $model->nominal_pencicilan = $cicilan;
                 } else {
-                    $model->jaminan = null;
+                    $model->jaminan = $post['jaminan'];
                     $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminjaman])->one();
 
                     //nominal admin
@@ -220,7 +220,8 @@ class PeminjamanController extends Controller
             ';
         } else {
             echo '
-
+                <label>Jaminan</label>
+                <input type="text" id="peminjaman-jaminan" class="form-control" name="jaminan" maxlength="100" aria-invalid="false" required=""><br>
             ';
         }
     }

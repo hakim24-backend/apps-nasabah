@@ -74,19 +74,13 @@ function to_rp($val)
             <?= Html::dropDownlist('cicilan',$model->id_jenis_pencicilan,[1=>'Sesuai Durasi',2=>'Langsung Lunas'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>
             <br>
 
-            <?php
-            echo $form->field($model, 'nominal_cicilan')->widget(MaskMoney::classname(), [
-                'pluginOptions' => [
-                'prefix' => 'Rp ',
-                'thousands' => '.',
-                'decimal' => ',',
-                'precision' => 0
-                ],
-                'options' => [
-                    'required'=>'required'
-                ]
-            ]);
-            ?>
+            <div id="nominal_update">
+                <label>Nominal Cicilan</label>
+                <input type="text" readonly id="nominal_update" class="form-control" name="nominal_update" value="<?=to_rp($model->nominal_cicilan)?>"><br>
+            </div>
+
+            <div id="nominal">
+            </div>
 
             <div class="form-group">
                 <?= Html::submitButton('Save', ['class' => 'btn btn-success btn-save']) ?>
@@ -103,36 +97,25 @@ function to_rp($val)
   
 $this->registerJs("
 
-    $('.btn-save').on('click',function(){
+    $('#cicilan').on('click',function(){
         var id = $('#cicilan').val();
         var denda = $('#denda').text();
         var denda_fix = denda.replace('Rp ','').replace(/\./g,'');
-        var nominal = $('#pencicilan-nominal_cicilan-disp').val();
-        var nominal_fix  = nominal.replace('Rp ','').replace(/\./g,'');
         var cicilan = $('#cicilan-bulan').text();
         var cicilan_fix  = cicilan.replace('Rp ','').replace(/\./g,'');
         var cicilan_lunas = $('#cicilan-lunas').text();
         var cicilan_lunas_fix  = cicilan_lunas.replace('Rp ','').replace(/\./g,'');
         var cicilan_denda = BigInt(cicilan_fix)+BigInt(denda_fix);
         var cicilan_lunas_denda = BigInt(cicilan_lunas_fix)+BigInt(denda_fix);
-        
-        if(id == 1){
-            if(BigInt(cicilan_denda) == BigInt(nominal_fix)){
-                return true;
-            } else {
-                alert('Harus Sesuai Dana Cicilan + Denda');
-                $('#pencicilan-nominal_cicilan-disp').focus();
-                return false;
-            }
-        } else {
-            if(BigInt(cicilan_lunas_denda) == BigInt(nominal_fix)){
-                return true;
-            } else {
-                alert('Harus Sesuai Dana Langsung Lunas + Denda');
-                $('#pencicilan-nominal_cicilan-disp').focus();
-                return false;
-            }
-        }
+
+        $.ajax({
+          url : '" . Yii::$app->urlManager->baseUrl."/pencicilan/get-nominal-cicilan?id='+id+'&cicilan_denda='+cicilan_denda+'&cicilan_lunas_denda='+cicilan_lunas_denda,
+          dataType : 'html',
+          success: function (data) {
+            $('#nominal_update').hide();
+            $('#nominal').html(data);
+          }
+        })
 
     });
  
