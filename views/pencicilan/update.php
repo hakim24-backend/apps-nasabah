@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use kartik\money\MaskMoney;
 use kartik\select2\Select2;
+use kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Pencicilan */
@@ -69,6 +70,14 @@ function to_rp($val)
     <div class="box box-info">
         <div class="box-body">
             <?php $form = ActiveForm::begin(); ?>
+
+            <?php echo $form->field($model, 'tanggal_waktu_cicilan')->widget(DatePicker::classname(), [
+                'options' => ['placeholder' => 'Masukkan tanggal ...'],
+                'pluginOptions' => [
+                    'autoclose'=>true,
+                    'format' => 'yyyy-mm-dd'
+                ]
+            ])?>
 
             <label>Jenis Cicilan</label>
             <?= Html::dropDownlist('cicilan',$model->id_jenis_pencicilan,[1=>'Sesuai Durasi',2=>'Langsung Lunas'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>

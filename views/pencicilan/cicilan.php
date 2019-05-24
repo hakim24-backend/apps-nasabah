@@ -81,7 +81,8 @@ function to_rp($val)
                         if ($model->tanggal_waktu_cicilan == null) {
                             return 'Belum ada';
                         } else {
-                            return $model->tanggal_waktu_cicilan;
+                            $date=date_create($model->tanggal_waktu_cicilan);
+                            return date_format($date, 'd F Y');
                         }
                     }
                     ],

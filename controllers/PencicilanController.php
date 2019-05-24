@@ -118,7 +118,7 @@ class PencicilanController extends Controller
         $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman, $jenisPeminjaman->besar_pinalti_langsung_lunas, $peminjaman->nominal_pencicilan, $peminjaman->id, $peminjaman->nominal_tabungan_ditahan);
         $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
 
-        if ((Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
 
             if ($post['cicilan'] == 2) {
@@ -137,7 +137,6 @@ class PencicilanController extends Controller
                 $nominal_lunas = str_ireplace('.', '', $post['nominal_lunas']);
                 $nominal_lunas = str_ireplace('Rp ', '', $nominal_lunas);
                 $model->nominal_cicilan = $nominal_lunas;
-                $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
                 $model->id_jenis_pencicilan = $post['cicilan'];
                 $model->nominal_denda_dibayar = $denda;
                 $model->save(false);
@@ -149,7 +148,6 @@ class PencicilanController extends Controller
                 $nominal_sesuai_durasi = str_ireplace('.', '', $post['nominal_sesuai_durasi']);
                 $nominal_sesuai_durasi = str_ireplace('Rp ', '', $nominal_sesuai_durasi);
                 $model->nominal_cicilan = $nominal_sesuai_durasi;
-                $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
                 $model->id_jenis_pencicilan = $post['cicilan'];
                 $model->nominal_denda_dibayar = $denda;
                 $model->save(false);
@@ -198,7 +196,7 @@ class PencicilanController extends Controller
         $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
         
 
-        if (Yii::$app->request->post()) {
+        if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
 
              $dataLunas = Pencicilan::find()->where(['id_peminjaman'=>$peminjaman->id])->all();
@@ -220,7 +218,6 @@ class PencicilanController extends Controller
                 $nominal_lunas = str_ireplace('.', '', $post['nominal_lunas']);
                 $nominal_lunas = str_ireplace('Rp ', '', $nominal_lunas);
                 $model->nominal_cicilan = $nominal_lunas;
-                $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
                 $model->id_jenis_pencicilan = $post['cicilan'];
                 $model->nominal_denda_dibayar = $denda;
                 $model->save(false);
@@ -229,10 +226,11 @@ class PencicilanController extends Controller
                 return $this->redirect(['pencicilan/index']);
             } else {
                 $model->id_status_bayar = 2;
-                $nominal_sesuai_durasi = str_ireplace('.', '', $post['nominal_sesuai_durasi']);
-                $nominal_sesuai_durasi = str_ireplace('Rp ', '', $nominal_sesuai_durasi);
-                $model->nominal_cicilan = $nominal_sesuai_durasi;
-                $model->tanggal_waktu_cicilan = date('Y-m-d H:i:s');
+                if($post ==  null) {
+                    $nominal_sesuai_durasi = str_ireplace('.', '', $post['nominal_sesuai_durasi']);
+                    $nominal_sesuai_durasi = str_ireplace('Rp ', '', $nominal_sesuai_durasi);
+                    $model->nominal_cicilan = $nominal_sesuai_durasi;
+                }
                 $model->id_jenis_pencicilan = $post['cicilan'];
                 $model->nominal_denda_dibayar = $denda;
                 $model->save(false);
