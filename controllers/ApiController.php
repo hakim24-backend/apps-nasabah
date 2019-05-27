@@ -333,10 +333,10 @@ class ApiController extends \yii\rest\Controller
 	            $response['direct_payment_amount'] = Pencicilan::getLunasDipercepat($credit['id_jenis_peminjaman'], $totalCicilan, $credit['durasi'], $credit['nominal_peminjaman'], $peminjaman_jenis['besar_pinalti_langsung_lunas'], $credit['nominal_pencicilan'], $credit['id'], $credit['nominal_tabungan_ditahan']);
 
     			foreach ($bills as $key => $value) {
-					//denda
+					//denda for pelunasan
 					if($value['id_status_bayar'] == 1) {
 						if($value['nominal_denda_berhenti'] != null){
-							$value['nominal_denda'] = $value['nominal_denda_berhenti'];
+							$value['nominal_denda'] = $value['nominal_denda_berhenti'] - $value['nominal_denda_dibayar'];
 						} else {
 							$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
 						}
@@ -351,6 +351,22 @@ class ApiController extends \yii\rest\Controller
 
 	        		//pelunasan
 	        		$response['direct_payment_amount'] += $value['nominal_denda'];
+
+	        		//re-compute denda
+					if($value['id_status_bayar'] == 1) {
+						if($value['nominal_denda_berhenti'] != null){
+							$value['nominal_denda'] = $value['nominal_denda_berhenti'];
+						} else {
+							$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
+						}
+	        			
+	        		} else {
+	        			if($value['nominal_denda_dibayar'] != null && $value['nominal_denda_dibayar'] > 0 ){
+		        			$value['nominal_denda'] = $value['nominal_denda_dibayar'];
+		        		} else {
+		        			$value['nominal_denda'] = 0;
+		        		}
+	        		}
 
     				//nama_pelayan
         			$pengguna = Pengguna::find()->where(['id'=>$value['id_pengguna']])->one();
