@@ -163,7 +163,7 @@ class PencicilanController extends Controller
                         } else {
                             //bayar uang lebih
                             $model->nominal_cicilan = $peminjaman->nominal_pencicilan;
-                            $sisa = $nominal_sesuai_durasi - $model->nominal_cicilan
+                            $sisa = $nominal_sesuai_durasi - $model->nominal_cicilan;
 
                             if($denda > $sisa){
                                 $model->nominal_denda_dibayar = $sisa;
@@ -273,7 +273,7 @@ class PencicilanController extends Controller
                             } else {
                                 //bayar uang lebih
                                 $model->nominal_cicilan = $peminjaman->nominal_pencicilan;
-                                $sisa = $nominal_sesuai_durasi - $model->nominal_cicilan
+                                $sisa = $nominal_sesuai_durasi - $model->nominal_cicilan;
 
                                 if($denda > $sisa){
                                     $model->nominal_denda_dibayar = $sisa;
