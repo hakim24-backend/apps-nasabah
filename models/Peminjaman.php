@@ -85,7 +85,7 @@ class Peminjaman extends \yii\db\ActiveRecord
             'foto_optional' => 'Foto Optional',
             'tanggal_waktu_pembuatan' => 'Tanggal Waktu Pembuatan',
             'id_status_peminjaman' => 'Status Peminjaman',
-            'id_pengguna' => 'Id Pengguna',
+            'id_pengguna' => 'Admin',
         ];
     }
 

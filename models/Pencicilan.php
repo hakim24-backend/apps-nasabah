@@ -60,11 +60,11 @@ class Pencicilan extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'id_peminjaman' => 'Id Peminjaman',
-            'id_pengguna' => 'Id Pengguna',
+            'id_pengguna' => 'Admin',
             'id_jenis_pencicilan' => 'Jenis Pencicilan',
             'tanggal_jatuh_tempo' => 'Tanggal Jatuh Tempo',
             'nominal_cicilan' => 'Nominal Pembayaran',
-            'nominal_denda_dibayar' => 'Nominal Denda Dibayar',
+            'nominal_denda_dibayar' => 'Denda',
             'nominal_denda_berhenti' => 'Nominal Denda Berhenti',
             'tanggal_waktu_cicilan' => 'Terbayar Pada',
             'id_status_bayar' => 'Status Pembayaran',

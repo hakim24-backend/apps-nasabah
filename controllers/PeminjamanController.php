@@ -156,6 +156,7 @@ class PeminjamanController extends Controller
                 $model->id_jenis_durasi = $post['jenis-durasi'];
                 $model->tanggal_waktu_pembuatan = date('Y-m-d');
                 $model->id_status_peminjaman = 1;
+                $model->id_pengguna = Yii::$app->user->identity->id;
                 $savePeminjaman = $model->save(false);
 
                 if ($savePeminjaman) {

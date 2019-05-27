@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
+use app\models\Pengguna;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Peminjaman */
@@ -30,6 +31,18 @@ function to_rp($val)
                     // 'id',
                     // 'id_nasabah',
                     // 'id_jenis_peminjaman',
+                    [
+                    'attribute' => 'id_pengguna',
+                    'value' => function($model){
+                        $data = Pengguna::find()->where(['id'=>$model->id_pengguna])->one();
+
+                        if ($data['nama'] == null) {
+                            return 'Belum ada';
+                        } else {
+                            return $data->nama;
+                        }
+                    }
+                    ],
                     [
                     'attribute' => 'id_status_peminjaman',
                     'value' => function($model){

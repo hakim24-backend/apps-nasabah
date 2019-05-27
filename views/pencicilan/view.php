@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
+use app\models\Pengguna;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Pencicilan */
@@ -30,14 +31,43 @@ function to_rp($val)
                     // 'id',
                     // 'id_peminjaman',
                     [
+                    'attribute' => 'id_pengguna',
+                    'value' => function($model){
+                        $data = Pengguna::find()->where(['id'=>$model->id_pengguna])->one();
+
+                        if ($data['nama'] == null) {
+                            return 'Belum ada';
+                        } else {
+                            return $data->nama;
+                        }
+                    }
+                    ],
+                    [
                     'attribute' => 'nominal_cicilan',
                     'value' => function($model){
                         return to_rp($model->nominal_cicilan);
                     }
                     ],
                     [
+                    'attribute' => 'nominal_denda_dibayar',
+                    'value' => function($model){
+                        if ($model->nominal_denda_dibayar == null) {
+                            return 'Belum ada';
+                        } else {
+                            return to_rp($model->nominal_denda_dibayar);
+                        }
+                    }
+                    ],
+                    [
                         'attribute' => 'tanggal_waktu_cicilan',
-                        'value' => $model->tanggal_waktu_cicilan != null ? $model->tanggal_waktu_cicilan : 'Belum Ada'
+                        'value' => function($model){
+                            $date=date_create($model->tanggal_waktu_cicilan);
+                            if ($model->tanggal_waktu_cicilan == null) {
+                                return 'Belum ada';
+                            } else {
+                                return date_format($date, 'd F Y');
+                            }
+                        }
                     ],
                     // 'id_pengguna',
                     [

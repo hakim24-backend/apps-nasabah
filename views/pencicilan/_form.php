@@ -127,6 +127,11 @@ $this->registerJs("
           }
         })
 
+        $(document).ready(function(){
+            // Format mata uang.
+            $('#nominal_sesuai_durasi').mask('000.000.000.000.000.000.000.000.000.000', {reverse: true});
+        })
+
     });
  
 ");

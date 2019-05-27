@@ -35,12 +35,12 @@ $this->title = 'Web Admin Pinjaman Online';
             <div class="col-lg-4">
                 <h2>Pencicilan</h2>
 
-                <p>Fitur ini bisa memantau cicilan nasabah per periode</p>
+                <p>Fitur ini bisa memantau cicilan nasabah per periode mulai dari cicilan per bulan atau per minggu, denda, dan detail  </p>
             </div>
             <div class="col-lg-4">
-                <h2>Peminjaman</h2>
+                <h2>Master Pengguna</h2>
 
-                <p>Fitur ini mencatat data nasabah yang ingin melakukan peminjaman uang. Syarat peminjaman uang ini yaitu harus menjadi nasabah terlebih dahulu</p>
+                <p>Untuk fitur ini dapat membuat akun admin lebih dari satu</p>
             </div>
         </div>
 

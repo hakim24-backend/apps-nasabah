@@ -143,6 +143,7 @@ class PencicilanController extends Controller
                     $model->nominal_cicilan = $nominal_lunas;
                     $model->id_jenis_pencicilan = $post['cicilan'];
                     $model->nominal_denda_dibayar = $denda;
+                    $model->id_pengguna = Yii::$app->user->identity->id;
                     $model->save(false);
 
                     $transaction->commit();
@@ -325,6 +326,7 @@ class PencicilanController extends Controller
                     }
                     
                     $model->id_jenis_pencicilan = $post['cicilan'];
+                    $model->id_pengguna = Yii::$app->user->identity->id;
                     $model->save(false);
 
                     $transaction->commit();
@@ -445,7 +447,7 @@ class PencicilanController extends Controller
         if ($id == 1) {
             echo '
                 <label>Nominal Cicilan</label>
-                <input type="text" id="nominal_sesuai_durasi" class="form-control" name="nominal_sesuai_durasi" value="'.to_rp($cicilan_denda).'"><br>
+                <input src="js/jquery.mask.min.js" type="text" id="nominal_sesuai_durasi" class="form-control" name="nominal_sesuai_durasi" value="'.to_rp($cicilan_denda).'"><br>
             ';
         } elseif ($id == 2) {
             echo '
