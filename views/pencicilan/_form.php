@@ -61,11 +61,16 @@ function to_rp($val)
             <?php } else { ?>
                 <?php if ($info->id_jenis_durasi == 1) { ?>
                     Durasi = <?=$info->durasi?> Minggu<br>
-                    Total Cicilan Perminggu = <?=$totalCicilan?>x
+                    Total Cicilan Perminggu = <?=$totalCicilan?>x<br>
                 <?php } else { ?>
                     Durasi = <?=$info->durasi?> Bulan<br>
-                    Total Cicilan Perbulan = <?=$totalCicilan?>x
+                    Total Cicilan Perbulan = <?=$totalCicilan?>x<br>
                 <?php } ?>
+            <?php } ?>
+            <?php if ($model->nominal_cicilan == null) { ?>
+                Sisa Cicilan Yang Harus Dibayar = <?=to_rp($info->nominal_pencicilan)?>
+            <?php } else { ?>
+                Sisa Cicilan Yang Harus Dibayar = <?=to_rp($info->nominal_pencicilan - $model->nominal_cicilan)?>
             <?php } ?> 
         </div>
     </div>

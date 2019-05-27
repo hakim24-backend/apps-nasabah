@@ -63,11 +63,11 @@ class Pencicilan extends \yii\db\ActiveRecord
             'id_pengguna' => 'Id Pengguna',
             'id_jenis_pencicilan' => 'Jenis Pencicilan',
             'tanggal_jatuh_tempo' => 'Tanggal Jatuh Tempo',
-            'nominal_cicilan' => 'Nominal Cicilan',
+            'nominal_cicilan' => 'Nominal Pembayaran',
             'nominal_denda_dibayar' => 'Nominal Denda Dibayar',
             'nominal_denda_berhenti' => 'Nominal Denda Berhenti',
-            'tanggal_waktu_cicilan' => 'Tanggal Waktu Cicilan',
-            'id_status_bayar' => 'Id Status Bayar',
+            'tanggal_waktu_cicilan' => 'Terbayar Pada',
+            'id_status_bayar' => 'Status Pembayaran',
             'periode' => 'Periode',
         ];
     }

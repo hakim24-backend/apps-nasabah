@@ -20,6 +20,7 @@ function to_rp($val)
 
     <p>
         <a class="btn btn-danger" href="<?php echo Url::to(['pencicilan/index']) ?>">Kembali</a>
+        <?= Html::a('Reset Filter', ['pencicilan/cicilan','id'=>$id], ['class' => 'btn btn-success']) ?>
     </p>
 
     <div class="box box-info">
@@ -93,6 +94,18 @@ function to_rp($val)
                         } else {
                             $date=date_create($model->tanggal_waktu_cicilan);
                             return date_format($date, 'd F Y');
+                        }
+                    }
+                    ],
+                    [
+                    'attribute' => 'id_status_bayar',
+                    'filter' => Html::dropDownlist('PencicilanSearch[id_status_bayar]',null,[1=>'Belum Lunas', 2=>'Lunas'], ['prompt' => 'Pilih Status', 'required' => true, 'class' => 'form-control', 'id' => 'status', 'style' => 'width: 100%']),
+                    'format' => 'raw',
+                    'value' => function($model){
+                        if ($model->id_status_bayar == 1) {
+                            return '<span class="label label-info">Belum Lunas</span>';
+                        } else {
+                            return '<span class="label label-success">Lunas</span>';
                         }
                     }
                     ],
