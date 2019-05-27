@@ -108,51 +108,235 @@ class PencicilanController extends Controller
 
         $model = Pencicilan::find()->where(['id'=>$id])->one();
         $peminjaman = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
-        $info = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
-        $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$info->id_jenis_peminjaman])->one();
-        $cicilanDenda = Pencicilan::find()->where(['id'=>$id])->one();
+        $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$peminjaman->id_jenis_peminjaman])->one();
 
         $totalCicilan = Pencicilan::getTotalCicilan($model->id_peminjaman);
 
         //lunas dipercepat jaminan
         $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman, $jenisPeminjaman->besar_pinalti_langsung_lunas, $peminjaman->nominal_pencicilan, $peminjaman->id, $peminjaman->nominal_tabungan_ditahan);
-        $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
+
+        if($model->nominal_denda_berhenti != null){
+            $denda = $model->nominal_denda_berhenti;
+        } else {
+            $denda = Peminjaman::getDenda($model->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
+        }
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
 
-            if ($post['cicilan'] == 2) {
-                
-                //update status lunas
-                $peminjaman->id_status_peminjaman = 2;
-                $peminjaman->save(false);
+            $transaction = Yii::$app->db->beginTransaction();
+            try{
+                if ($post['cicilan'] == 2) {
+                    $nominal_lunas = str_ireplace('.', '', $post['nominal_lunas']);
+                    $nominal_lunas = str_ireplace('Rp ', '', $nominal_lunas);
 
-                $dataCicilan = Pencicilan::find()->where(['id_peminjaman'=>$peminjaman->id])->all();
+                    //update status lunas
+                    $peminjaman->id_status_peminjaman = 2;
+                    $peminjaman->save(false);
 
-                foreach ($dataCicilan as $key => $value) {
-                    $value->id_status_bayar = 2;
-                    $value->save(false);
+                    $dataCicilan = Pencicilan::find()->where(['id_peminjaman'=>$peminjaman->id])->all();
+
+                    foreach ($dataCicilan as $key => $value) {
+                        $value->id_status_bayar = 2;
+                        $value->save(false);
+                    }
+
+                    $model->nominal_cicilan = $nominal_lunas;
+                    $model->id_jenis_pencicilan = $post['cicilan'];
+                    $model->nominal_denda_dibayar = $denda;
+                    $model->save(false);
+
+                    $transaction->commit();
+
+                    Yii::$app->session->setFlash('success', "Tambah Data Cicilan Nasabah Berhasil");
+                    return $this->redirect(['pencicilan/index']);
+                } else {
+                    $nominal_sesuai_durasi = str_ireplace('.', '', $post['nominal_sesuai_durasi']);
+                    $nominal_sesuai_durasi = str_ireplace('Rp ', '', $nominal_sesuai_durasi);
+
+                    if($model->nominal_cicilan == null){
+                        //saat belum ada pembayaran pada suatu pencicilan
+
+                        if ($nominal_sesuai_durasi < $peminjaman->nominal_pencicilan) {
+                            //bayar uang kurang
+                            $model->nominal_cicilan = $nominal_sesuai_durasi;
+                        } else {
+                            //bayar uang lebih
+                            $model->nominal_cicilan = $peminjaman->nominal_pencicilan;
+                            $sisa = $nominal_sesuai_durasi - $model->nominal_cicilan
+
+                            if($denda > $sisa){
+                                $model->nominal_denda_dibayar = $sisa;
+                                $model->nominal_denda_berhenti = $denda;
+
+                                $sisa -= $sisa;
+                            } else {
+                                $model->id_status_bayar = 2;
+                                $model->nominal_denda_dibayar = $denda;
+                                $model->nominal_denda_berhenti = $denda;
+
+                                $sisa -= $denda;
+                            }
+
+                            $next = 1;
+                            while ($sisa > 0){
+                                $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+$next)])->one();
+                                $next_denda = Peminjaman::getDenda($next_pencicilan->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
+                                if($next_pencicilan){
+                                    // nextpencicilan belum ada bayar sama sekali
+                                    if ($sisa < $peminjaman->nominal_pencicilan) {
+                                        //bayar uang kurang
+                                        $next_pencicilan->nominal_cicilan = $sisa;
+
+                                        $sisa -= $sisa;
+                                    } else {
+                                        $next_pencicilan->nominal_cicilan = $peminjaman->nominal_pencicilan;
+                                        $sisa = $sisa - $next_pencicilan->nominal_cicilan;
+
+                                        if($next_denda > $sisa){
+                                            $next_pencicilan->nominal_denda_dibayar = $sisa;
+                                            $next_pencicilan->nominal_denda_berhenti = $next_denda;
+
+                                            $sisa -= $sisa;
+                                        } else {
+                                            $next_pencicilan->id_status_bayar = 2;
+                                            $next_pencicilan->nominal_denda_dibayar = $next_denda;
+                                            $next_pencicilan->nominal_denda_berhenti = $next_denda;
+
+                                            $sisa -= $next_denda;
+                                        }
+                                    }
+
+                                    $next_pencicilan->save(false);
+                                }
+                                $next++;
+                            }
+                        }
+                    } else {
+                        if ($model->nominal_cicilan == $peminjaman->nominal_pencicilan) {
+                            //perhitungan bagi yang hanya sisa denda saja
+
+                            $sisa = $nominal_sesuai_durasi;
+
+                            if (($model->nominal_denda_berhenti - $model->nominal_denda_dibayar) > $sisa) {
+                                $model->nominal_denda_dibayar += $sisa;
+
+                                $sisa -= $sisa;
+
+                            } else {
+                                $model->id_status_bayar = 2;
+                                $model->nominal_denda_dibayar = $model->nominal_denda_berhenti;
+
+                                $sisa -= $model->nominal_denda_berhenti;
+                            }
+
+                            $next = 1;
+                            while ($sisa > 0){
+                                $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+$next)])->one();
+                                $next_denda = Peminjaman::getDenda($next_pencicilan->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
+                                if($next_pencicilan){
+                                    // nextpencicilan belum ada bayar sama sekali
+                                    if ($sisa < $peminjaman->nominal_pencicilan) {
+                                        //bayar uang kurang
+                                        $next_pencicilan->nominal_cicilan = $sisa;
+
+                                        $sisa -= $sisa;
+                                    } else {
+                                        $next_pencicilan->nominal_cicilan = $peminjaman->nominal_pencicilan;
+                                        $sisa = $sisa - $next_pencicilan->nominal_cicilan;
+
+                                        if($next_denda > $sisa){
+                                            $next_pencicilan->nominal_denda_dibayar = $sisa;
+                                            $next_pencicilan->nominal_denda_berhenti = $next_denda;
+
+                                            $sisa -= $sisa;
+                                        } else {
+                                            $next_pencicilan->id_status_bayar = 2;
+                                            $next_pencicilan->nominal_denda_dibayar = $next_denda;
+                                            $next_pencicilan->nominal_denda_berhenti = $next_denda;
+
+                                            $sisa -= $next_denda;
+                                        }
+                                    }
+
+                                    $next_pencicilan->save(false);
+                                }
+                                $next++;
+                            }
+
+                        } else {
+                            //perhitungan bagi yang pencicilan pokok masih kurang
+
+                            if ($nominal_sesuai_durasi < $peminjaman->nominal_pencicilan - $model->nominal_cicilan) {
+                                //bayar uang kurang
+                                $model->nominal_cicilan += $nominal_sesuai_durasi;
+                            } else {
+                                //bayar uang lebih
+                                $model->nominal_cicilan = $peminjaman->nominal_pencicilan;
+                                $sisa = $nominal_sesuai_durasi - $model->nominal_cicilan
+
+                                if($denda > $sisa){
+                                    $model->nominal_denda_dibayar = $sisa;
+                                    $model->nominal_denda_berhenti = $denda;
+
+                                    $sisa -= $sisa;
+                                } else {
+                                    $model->id_status_bayar = 2;
+                                    $model->nominal_denda_dibayar = $denda;
+                                    $model->nominal_denda_berhenti = $denda;
+
+                                    $sisa -= $denda;
+                                }
+
+                                $next = 1;
+                                while ($sisa > 0){
+                                    $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+$next)])->one();
+                                    $next_denda = Peminjaman::getDenda($next_pencicilan->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
+                                    if($next_pencicilan){
+                                        // nextpencicilan belum ada bayar sama sekali
+                                        if ($sisa < $peminjaman->nominal_pencicilan) {
+                                            //bayar uang kurang
+                                            $next_pencicilan->nominal_cicilan = $sisa;
+
+                                            $sisa -= $sisa;
+                                        } else {
+                                            $next_pencicilan->nominal_cicilan = $peminjaman->nominal_pencicilan;
+                                            $sisa = $sisa - $next_pencicilan->nominal_cicilan;
+
+                                            if($next_denda > $sisa){
+                                                $next_pencicilan->nominal_denda_dibayar = $sisa;
+                                                $next_pencicilan->nominal_denda_berhenti = $next_denda;
+
+                                                $sisa -= $sisa;
+                                            } else {
+                                                $next_pencicilan->id_status_bayar = 2;
+                                                $next_pencicilan->nominal_denda_dibayar = $next_denda;
+                                                $next_pencicilan->nominal_denda_berhenti = $next_denda;
+
+                                                $sisa -= $next_denda;
+                                            }
+                                        }
+
+                                        $next_pencicilan->save(false);
+                                    }
+                                    $next++;
+                                }
+                            }
+                        }
+                    }
+                    
+                    $model->id_jenis_pencicilan = $post['cicilan'];
+                    $model->save(false);
+
+                    $transaction->commit();
+
+                    Yii::$app->session->setFlash('success', "Tambah Data Cicilan Nasabah Berhasil");
+                    return $this->redirect(['pencicilan/cicilan/','id'=>$model->id_peminjaman]);
                 }
 
-                $nominal_lunas = str_ireplace('.', '', $post['nominal_lunas']);
-                $nominal_lunas = str_ireplace('Rp ', '', $nominal_lunas);
-                $model->nominal_cicilan = $nominal_lunas;
-                $model->id_jenis_pencicilan = $post['cicilan'];
-                $model->nominal_denda_dibayar = $denda;
-                $model->save(false);
-
-                Yii::$app->session->setFlash('success', "Tambah Data Cicilan Nasabah Berhasil");
-                return $this->redirect(['pencicilan/index']);
-            } else {
-                $model->id_status_bayar = 2;
-                $nominal_sesuai_durasi = str_ireplace('.', '', $post['nominal_sesuai_durasi']);
-                $nominal_sesuai_durasi = str_ireplace('Rp ', '', $nominal_sesuai_durasi);
-                $model->nominal_cicilan = $nominal_sesuai_durasi;
-                $model->id_jenis_pencicilan = $post['cicilan'];
-                $model->nominal_denda_dibayar = $denda;
-                $model->save(false);
-
-                Yii::$app->session->setFlash('success', "Tambah Data Cicilan Nasabah Berhasil");
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash('failed', "Gagal Data Cicilan Nasabah Berhasil");
                 return $this->redirect(['pencicilan/cicilan/','id'=>$model->id_peminjaman]);
             }
         }
@@ -161,10 +345,10 @@ class PencicilanController extends Controller
             'model' => $model,
             'peminjaman' => $peminjaman,
             'totalCicilan' => $totalCicilan,
-            'info' => $info,
+            'info' => $peminjaman,
             'rumus' => $rumus,
             'denda' => $denda,
-            'cicilanDenda' => $cicilanDenda
+            'cicilanDenda' => $model
         ]);
     }
 

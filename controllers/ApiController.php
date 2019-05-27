@@ -335,8 +335,12 @@ class ApiController extends \yii\rest\Controller
     			foreach ($bills as $key => $value) {
 					//denda
 					if($value['id_status_bayar'] == 1) {
-	        			// $value['nominal_denda'] = Peminjaman::getDenda($credit['id_jenis_durasi'], $value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
-	        			$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
+						if($value['nominal_denda_berhenti'] != null){
+							$value['nominal_denda'] = $value['nominal_denda_berhenti'];
+						} else {
+							$value['nominal_denda'] = Peminjaman::getDenda($value['tanggal_jatuh_tempo'], $credit['nominal_pencicilan'], $peminjaman_jenis['besar_denda']);
+						}
+	        			
 	        		} else {
 	        			if($value['nominal_denda_dibayar'] != null && $value['nominal_denda_dibayar'] > 0 ){
 		        			$value['nominal_denda'] = $value['nominal_denda_dibayar'];

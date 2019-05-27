@@ -17,6 +17,7 @@ use Yii;
  * @property int $id_status_bayar
  * @property int $periode
  * @property double $nominal_denda_dibayar
+ * @property double $nominal_denda_berhenti
  *
  * @property Peminjaman $peminjaman
  * @property Pengguna $pengguna
@@ -43,6 +44,7 @@ class Pencicilan extends \yii\db\ActiveRecord
             [['tanggal_jatuh_tempo', 'tanggal_waktu_cicilan'], 'safe'],
             [['nominal_cicilan'], 'number'],
             [['nominal_denda_dibayar'], 'number'],
+            [['nominal_denda_berhenti'], 'number'],
             [['id_peminjaman'], 'exist', 'skipOnError' => true, 'targetClass' => Peminjaman::className(), 'targetAttribute' => ['id_peminjaman' => 'id']],
             [['id_pengguna'], 'exist', 'skipOnError' => true, 'targetClass' => Pengguna::className(), 'targetAttribute' => ['id_pengguna' => 'id']],
             [['id_jenis_pencicilan'], 'exist', 'skipOnError' => true, 'targetClass' => PencicilanJenis::className(), 'targetAttribute' => ['id_jenis_pencicilan' => 'id']],
@@ -63,6 +65,7 @@ class Pencicilan extends \yii\db\ActiveRecord
             'tanggal_jatuh_tempo' => 'Tanggal Jatuh Tempo',
             'nominal_cicilan' => 'Nominal Cicilan',
             'nominal_denda_dibayar' => 'Nominal Denda Dibayar',
+            'nominal_denda_berhenti' => 'Nominal Denda Berhenti',
             'tanggal_waktu_cicilan' => 'Tanggal Waktu Cicilan',
             'id_status_bayar' => 'Id Status Bayar',
             'periode' => 'Periode',
