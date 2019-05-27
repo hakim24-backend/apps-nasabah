@@ -114,7 +114,12 @@ class PencicilanController extends Controller
 
         //lunas dipercepat jaminan
         $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman, $jenisPeminjaman->besar_pinalti_langsung_lunas, $peminjaman->nominal_pencicilan, $peminjaman->id, $peminjaman->nominal_tabungan_ditahan);
-        $denda = Peminjaman::getDenda($model->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
+
+        if($model->nominal_denda_berhenti != null){
+            $denda = $model->nominal_denda_berhenti;
+        } else {
+            $denda = Peminjaman::getDenda($model->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
+        }
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
@@ -340,10 +345,10 @@ class PencicilanController extends Controller
             'model' => $model,
             'peminjaman' => $peminjaman,
             'totalCicilan' => $totalCicilan,
-            'info' => $info,
+            'info' => $peminjaman,
             'rumus' => $rumus,
             'denda' => $denda,
-            'cicilanDenda' => $cicilanDenda
+            'cicilanDenda' => $model
         ]);
     }
 
