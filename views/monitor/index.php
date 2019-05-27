@@ -51,9 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     [
                         'format' => 'raw',
                         'value'=>function($model){
-                            if ($model->peminjamenOne->id_status_peminjaman == 1) {
-                                return '<span class="label label-danger">Belum Lunas</span>';
-                            }
+                            return '<span class="label label-danger">Belum Lunas</span>';
                         }
                     ],
                     //'latitude',

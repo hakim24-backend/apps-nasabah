@@ -17,7 +17,8 @@ class PencicilanSearch extends Pencicilan
     public function rules()
     {
         return [
-            [['id', 'id_peminjaman', 'id_pengguna', 'id_jenis_pencicilan'], 'integer']
+            [['id', 'id_peminjaman', 'id_pengguna', 'id_jenis_pencicilan'], 'integer'],
+            [['tanggal_waktu_cicilan'], 'safe'],
         ];
     }
 
@@ -61,6 +62,7 @@ class PencicilanSearch extends Pencicilan
             'id_peminjaman' => $this->id_peminjaman,
             'id_pengguna' => $this->id_pengguna,
             'id_jenis_pencicilan' => $this->id_jenis_pencicilan,
+            'tanggal_waktu_cicilan' => $this->tanggal_waktu_cicilan,
         ]);
 
         return $dataProvider;

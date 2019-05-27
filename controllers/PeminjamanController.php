@@ -154,7 +154,7 @@ class PeminjamanController extends Controller
                 $model->foto_bersama_ktp = $post['foto_ktp_2'];
                 $model->nomor_kontrak = $post['nomor_kontrak'];
                 $model->id_jenis_durasi = $post['jenis-durasi'];
-                $model->tanggal_waktu_pembuatan = date('Y-m-d H:i:s');
+                $model->tanggal_waktu_pembuatan = date('Y-m-d');
                 $model->id_status_peminjaman = 1;
                 $savePeminjaman = $model->save(false);
 
