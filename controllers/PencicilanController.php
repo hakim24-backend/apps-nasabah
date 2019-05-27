@@ -110,19 +110,20 @@ class PencicilanController extends Controller
         $peminjaman = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
         $info = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
         $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$info->id_jenis_peminjaman])->one();
-        $cicilanDenda = Pencicilan::find()->where(['id'=>$id])->one();
 
         $totalCicilan = Pencicilan::getTotalCicilan($model->id_peminjaman);
 
         //lunas dipercepat jaminan
         $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman, $jenisPeminjaman->besar_pinalti_langsung_lunas, $peminjaman->nominal_pencicilan, $peminjaman->id, $peminjaman->nominal_tabungan_ditahan);
-        $denda = Peminjaman::getDenda($cicilanDenda->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
+        $denda = Peminjaman::getDenda($model->tanggal_jatuh_tempo, $info->nominal_pencicilan, $jenisPeminjaman->besar_denda);
 
         if ($model->load(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
 
             if ($post['cicilan'] == 2) {
-                
+                $nominal_lunas = str_ireplace('.', '', $post['nominal_lunas']);
+                $nominal_lunas = str_ireplace('Rp ', '', $nominal_lunas);
+
                 //update status lunas
                 $peminjaman->id_status_peminjaman = 2;
                 $peminjaman->save(false);
@@ -134,8 +135,6 @@ class PencicilanController extends Controller
                     $value->save(false);
                 }
 
-                $nominal_lunas = str_ireplace('.', '', $post['nominal_lunas']);
-                $nominal_lunas = str_ireplace('Rp ', '', $nominal_lunas);
                 $model->nominal_cicilan = $nominal_lunas;
                 $model->id_jenis_pencicilan = $post['cicilan'];
                 $model->nominal_denda_dibayar = $denda;
@@ -144,10 +143,46 @@ class PencicilanController extends Controller
                 Yii::$app->session->setFlash('success', "Tambah Data Cicilan Nasabah Berhasil");
                 return $this->redirect(['pencicilan/index']);
             } else {
-                $model->id_status_bayar = 2;
                 $nominal_sesuai_durasi = str_ireplace('.', '', $post['nominal_sesuai_durasi']);
                 $nominal_sesuai_durasi = str_ireplace('Rp ', '', $nominal_sesuai_durasi);
-                $model->nominal_cicilan = $nominal_sesuai_durasi;
+
+                if($model->nominal_cicilan == null){
+                    //saat belum ada pembayaran pada suatu pencicilan
+                    if($nominal_sesuai_durasi == $peminjaman->nominal_pencicilan){
+                        //bayar cicilan pokok saja
+                        $model->nominal_cicilan = $peminjaman->nominal_pencicilan
+                        if($denda == 0){
+                            $model->id_status_bayar = 2;
+                        }
+                    } elseif ($nominal_sesuai_durasi < $peminjaman->nominal_pencicilan) {
+                        //bayar uang kurang
+                        $model->nominal_cicilan = $nominal_sesuai_durasi;
+                    } else {
+                        $model->nominal_cicilan = $peminjaman->nominal_pencicilan;
+                        $sisa = $nominal_sesuai_durasi - $model->nominal_cicilan
+
+                        if($denda == 0){
+                            $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+1)])->one();
+                            if($next_pencicilan){
+                                // nextpencicilan belum ada bayar sama sekali
+                            }
+                        } else {
+                            if($denda < $sisa){
+                                $model->nominal_denda_dibayar = $denda;
+                            } else {
+                                $model->nominal_denda_dibayar = $sisa;
+                                $model->nominal_denda_berhenti = $denda - $model->nominal_denda_dibayar;
+                            }
+                        }
+
+                        do{
+                            
+
+                        } while ($nominal_sesuai_durasi > 0);
+                        
+                    }
+                } 
+                
                 $model->id_jenis_pencicilan = $post['cicilan'];
                 $model->nominal_denda_dibayar = $denda;
                 $model->save(false);
