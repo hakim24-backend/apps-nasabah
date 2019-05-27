@@ -102,12 +102,11 @@ function to_rp($val)
                     [
                         'class' => 'yii\grid\ActionColumn',
                         'template' => '{create} {view}',
+                        'contentOptions' => ['style'=>'text-align: right'],
                         'buttons' => [
                             'create' => function($url, $model, $key){
                                 if ($model->id_status_bayar == 1) {
                                     return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-plus"></span>']),['pencicilan/create','id'=>$model->id], ['class' => 'btn btn-success modalButtonView']);
-                                } else {
-                                    return Html::a(Yii::t('app','{modelClass}',['modelClass'=>'<span class="glyphicon glyphicon-pencil"></span>']),['pencicilan/update','id'=>$model->id], ['class' => 'btn btn-success modalButtonView']);
                                 }
                             },
                             'view' => function($url, $model, $key){
