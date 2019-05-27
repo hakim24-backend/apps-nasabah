@@ -180,7 +180,8 @@ class PencicilanController extends Controller
 
                             $next = 1;
                             while ($sisa > 0){
-                                $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+$next)])->one();
+                                $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+$next)])->andWhere(['id_peminjaman'=>$model->id_peminjaman])->one();
+
                                 $next_denda = Peminjaman::getDenda($next_pencicilan->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
                                 if($next_pencicilan){
                                     // nextpencicilan belum ada bayar sama sekali
@@ -232,7 +233,7 @@ class PencicilanController extends Controller
 
                             $next = 1;
                             while ($sisa > 0){
-                                $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+$next)])->one();
+                                $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+$next)])->andWhere(['id_peminjaman'=>$model->id_peminjaman])->one();
                                 $next_denda = Peminjaman::getDenda($next_pencicilan->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
                                 if($next_pencicilan){
                                     // nextpencicilan belum ada bayar sama sekali
@@ -290,7 +291,7 @@ class PencicilanController extends Controller
 
                                 $next = 1;
                                 while ($sisa > 0){
-                                    $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+$next)])->one();
+                                    $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+$next)])->andWhere(['id_peminjaman'=>$model->id_peminjaman])->one();
                                     $next_denda = Peminjaman::getDenda($next_pencicilan->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
                                     if($next_pencicilan){
                                         // nextpencicilan belum ada bayar sama sekali
