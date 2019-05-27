@@ -90,6 +90,24 @@ function to_rp($val)
             <?= Html::dropDownlist('cicilan',0,[1=>'Sesuai Durasi',2=>'Langsung Lunas'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>
             <br>
 
+            <div id="money">
+                <label>Nominal Cicilan</label>
+                <?php echo MaskMoney::widget([
+                    'name' => 'nominal_sesuai_durasi',
+                    'value' => $info->nominal_pencicilan,
+                    'pluginOptions' => [
+                        'prefix' => 'Rp. ',
+                        'suffix' => '',
+                        'affixesStay' => true,
+                        'thousands' => '.',
+                        'decimal' => ',',
+                        'precision' => 0, 
+                        'allowZero' => false,
+                        'allowNegative' => false,
+                    ]
+                ])?><br>
+            </div>
+
             <div id="nominal">
             </div>
 
@@ -108,6 +126,8 @@ function to_rp($val)
   
 $this->registerJs("
 
+    $('#money').hide();
+
     $('#cicilan').on('click',function(){
         var id = $('#cicilan').val();
         var denda = $('#denda').text();
@@ -119,17 +139,18 @@ $this->registerJs("
         var cicilan_denda = BigInt(cicilan_fix)+BigInt(denda_fix);
         var cicilan_lunas_denda = BigInt(cicilan_lunas_fix)+BigInt(denda_fix);
         
+        if(id == 1) {
+            $('#money').show();
+        } else {
+            $('#money').hide();
+        }
+        
         $.ajax({
           url : '" . Yii::$app->urlManager->baseUrl."/pencicilan/get-nominal-cicilan?id='+id+'&cicilan_denda='+cicilan_denda+'&cicilan_lunas_denda='+cicilan_lunas_denda,
           dataType : 'html',
           success: function (data) {
             $('#nominal').html(data);
           }
-        })
-
-        $(document).ready(function(){
-            // Format mata uang.
-            $('#nominal_sesuai_durasi').mask('000.000.000.000.000.000.000.000.000.000', {reverse: true});
         })
 
     });

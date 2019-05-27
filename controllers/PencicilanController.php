@@ -444,12 +444,7 @@ class PencicilanController extends Controller
         {
             return "Rp " . number_format($val,0,',','.');
         }
-        if ($id == 1) {
-            echo '
-                <label>Nominal Cicilan</label>
-                <input src="js/jquery.mask.min.js" type="text" id="nominal_sesuai_durasi" class="form-control" name="nominal_sesuai_durasi" value="'.to_rp($cicilan_denda).'"><br>
-            ';
-        } elseif ($id == 2) {
+        if ($id == 2) {
             echo '
                 <label>Nominal Cicilan</label>
                 <input type="text" readonly id="nominal_lunas" class="form-control" name="nominal_lunas" value="'.to_rp($cicilan_lunas_denda).'"><br>
