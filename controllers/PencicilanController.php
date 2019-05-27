@@ -109,7 +109,6 @@ class PencicilanController extends Controller
         $model = Pencicilan::find()->where(['id'=>$id])->one();
         $peminjaman = Peminjaman::find()->where(['id'=>$model->id_peminjaman])->one();
         $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$peminjaman->id_jenis_peminjaman])->one();
-
         $totalCicilan = Pencicilan::getTotalCicilan($model->id_peminjaman);
 
         //lunas dipercepat jaminan
@@ -271,9 +270,9 @@ class PencicilanController extends Controller
                                 //bayar uang kurang
                                 $model->nominal_cicilan += $nominal_sesuai_durasi;
                             } else {
-                                //bayar uang lebih
+                                //bayar uang lebih atau pas
+                                $sisa = $nominal_sesuai_durasi - ($peminjaman->nominal_pencicilan - $model->nominal_cicilan);
                                 $model->nominal_cicilan = $peminjaman->nominal_pencicilan;
-                                $sisa = $nominal_sesuai_durasi - $model->nominal_cicilan;
 
                                 if($denda > $sisa){
                                     $model->nominal_denda_dibayar = $sisa;
@@ -348,7 +347,8 @@ class PencicilanController extends Controller
             'info' => $peminjaman,
             'rumus' => $rumus,
             'denda' => $denda,
-            'cicilanDenda' => $model
+            'cicilanDenda' => $model,
+            'sisaCicilan' => $totalCicilan
         ]);
     }
 
