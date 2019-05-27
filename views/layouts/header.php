@@ -7,7 +7,7 @@ use yii\helpers\Html;
 
 <header class="main-header">
 
-    <?= Html::a('<span class="logo-mini"></span><span class="logo-lg">Menu Admin</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
+    <?= Html::a('<span class="logo-mini"></span><span class="logo-lg">Pinjaman Online</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
 
     <nav class="navbar navbar-static-top" role="navigation">
 
@@ -24,7 +24,7 @@ use yii\helpers\Html;
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="user-image" alt="User Image"/>
-                        <span class="hidden-xs">ADMIN</span>
+                        <span class="hidden-xs"><?=Yii::$app->user->identity->nama?></span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- User image -->
@@ -33,7 +33,7 @@ use yii\helpers\Html;
                                  alt="User Image"/>
 
                             <p>
-                                ADMIN
+                                <?=Yii::$app->user->identity->nama?>
                                 <small>Pinjaman Online</small>
                             </p>
                         </li>

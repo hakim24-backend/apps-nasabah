@@ -11,6 +11,7 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Akun;
 use app\models\Nasabah;
+use app\models\Pengguna;
 
 class SiteController extends Controller
 {
@@ -86,6 +87,7 @@ class SiteController extends Controller
         }
 
         $model->password = '';
+
         return $this->render('login', [
             'model' => $model,
         ]);

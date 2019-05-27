@@ -8,7 +8,7 @@
                 <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle" alt="User Image"/>
             </div>
             <div class="pull-left info">
-                <p>ADMIN</p>
+                <p><?=Yii::$app->user->identity->nama?></p>
                 <small>Pinjaman Online</small>
             </div>
         </div>
@@ -23,7 +23,7 @@
                     ['label' => 'Monitoring Nasabah', 'icon' => 'map-marker', 'url' => ['/monitor/index']],
                     ['label' => 'Peminjaman', 'icon' => 'credit-card', 'url' => ['/peminjaman/index']],
                     ['label' => 'Pencicilan', 'icon' => 'balance-scale', 'url' => ['/pencicilan/index']],
-                    ['label' => 'Pengguna', 'icon' => 'user', 'url' => ['/pengguna/index']],
+                    ['label' => 'Master Pengguna', 'icon' => 'user', 'url' => ['/pengguna/index']],
                     ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
                 ],
             ]
