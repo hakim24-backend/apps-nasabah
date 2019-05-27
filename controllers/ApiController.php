@@ -342,11 +342,7 @@ class ApiController extends \yii\rest\Controller
 						}
 	        			
 	        		} else {
-	        			if($value['nominal_denda_dibayar'] != null && $value['nominal_denda_dibayar'] > 0 ){
-		        			$value['nominal_denda'] = $value['nominal_denda_dibayar'];
-		        		} else {
-		        			$value['nominal_denda'] = 0;
-		        		}
+		        		$value['nominal_denda'] = 0;
 	        		}
 
 	        		//pelunasan
