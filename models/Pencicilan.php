@@ -107,20 +107,43 @@ class Pencicilan extends \yii\db\ActiveRecord
         return $data['total'];
     }
 
-    public function getLunasDipercepat($id_jenis_peminjaman,$totalCicilan,$durasi,$nominal_peminjaman, $besar_pinalti_langsung_lunas)
+    public function getLunasDipercepat($id_jenis_peminjaman,$totalCicilan,$durasi,$nominal_peminjaman, $besar_pinalti_langsung_lunas, $nominal_cicilan, $id_peminjaman, $nominal_tabungan_ditahan)
     {
         if ($id_jenis_peminjaman == 1) {
             //lunas dipercepat jaminan
             $intervalDurasi = $durasi - $totalCicilan;
-            $sisaCicilan = ($nominal_peminjaman/$durasi)*$intervalDurasi;
+            $sisaCicilan = ($nominal_peminjaman / $durasi) * $intervalDurasi;
 
             return ($sisaCicilan)+($besar_pinalti_langsung_lunas/100*$sisaCicilan);
 
         } else {
+            $pencicilan = Pencicilan::find()->where(['id'=>$id_peminjaman])->all();
+            $pernah_telat = false;
+
+            foreach ($pencicilan as $key => $value) {
+                if($value->id_status_bayar == 1){
+                    if(strtotime(date("Y-m-d")) > strtotime($value->tanggal_jatuh_tempo)){
+                        $pernah_telat = true;
+                        break;
+                    }
+                } else {
+                    if($value->nominal_denda_dibayar > 0){
+                        $pernah_telat = true;
+                        break;
+                    }
+                }
+            }
+
             //lunas dipercepat non-jaminan
             $intervalDurasi = $durasi - $totalCicilan;
 
-            return ($nominal_peminjaman/$durasi)*$intervalDurasi;
+            if($pernah_telat){
+                return $nominal_cicilan * $intervalDurasi;
+            } else {
+                return $nominal_cicilan * $intervalDurasi - $nominal_tabungan_ditahan;
+            }
+
+            
         }
     }
 }

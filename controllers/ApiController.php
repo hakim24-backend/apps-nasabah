@@ -330,7 +330,7 @@ class ApiController extends \yii\rest\Controller
 
     			//lunas dipercepat jamina	
     			$totalCicilan = Pencicilan::getTotalCicilan($credit['id']);
-	            $response['direct_payment_amount'] = Pencicilan::getLunasDipercepat($credit['id_jenis_peminjaman'], $totalCicilan, $credit['durasi'], $credit['nominal_peminjaman'], $peminjaman_jenis['besar_pinalti_langsung_lunas']);
+	            $response['direct_payment_amount'] = Pencicilan::getLunasDipercepat($credit['id_jenis_peminjaman'], $totalCicilan, $credit['durasi'], $credit['nominal_peminjaman'], $peminjaman_jenis['besar_pinalti_langsung_lunas'], $credit['nominal_pencicilan'], $credit['id'], $credit['nominal_tabungan_ditahan']);
 
     			foreach ($bills as $key => $value) {
 					//denda
