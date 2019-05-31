@@ -9,7 +9,7 @@ Selamat! Proses awal registrasi telah berhasil. Silakan klik link berikut ini un
 
 <?= 
 // Html::a(Html::button('Konfirmasi Akun', ['style' => 'width: 150px;height: 35px;background: #355438;border: none;color: white;']),Yii::$app->urlManager->createAbsoluteUrl(['site/confirm','access_token'=>$access_token])) 
-Html::a(Html::button('Konfirmasi Akun', ['style' => 'width: 150px;height: 35px;background: #355438;border: none;color: white;']),'http://192.168.1.12/pinjaman-online/web/site/confirm?access_token='.$access_token) 
+Html::a(Html::button('Konfirmasi Akun', ['style' => 'width: 150px;height: 35px;background: #355438;border: none;color: white;']),'http://192.168.43.17:8080/pinjaman_online/web/site/confirm?access_token='.$access_token) 
 ?>
 
 <br/>

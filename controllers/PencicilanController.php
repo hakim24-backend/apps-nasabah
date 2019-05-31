@@ -114,15 +114,13 @@ class PencicilanController extends Controller
         //lunas dipercepat jaminan
         $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman, $jenisPeminjaman->besar_pinalti_langsung_lunas, $peminjaman->nominal_pencicilan, $peminjaman->id, $peminjaman->nominal_tabungan_ditahan);
 
-        // var_dump($rumus);die;
-
         if($model->nominal_denda_berhenti != null){
             $denda = $model->nominal_denda_berhenti;
         } else {
             $denda = Peminjaman::getDenda($model->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
         }
 
-        if ($model->load(Yii::$app->request->post())) {
+        if (Yii::$app->request->post()) {
             $post = Yii::$app->request->post();
 
             $transaction = Yii::$app->db->beginTransaction();
@@ -142,8 +140,9 @@ class PencicilanController extends Controller
                         $value->save(false);
                     }
 
-                    $date=date($model->tanggal_waktu_cicilan.' H:i:s');
-                    $model->tanggal_waktu_cicilan = $date;
+                    // $date=date($model->tanggal_waktu_cicilan.' H:i:s');
+                    // $model->tanggal_waktu_cicilan = $date;
+                    $model->tanggal_waktu_cicilan = $post['tanggal_cicilan'];
                     $model->nominal_cicilan = $nominal_lunas;
                     $model->id_jenis_pencicilan = $post['cicilan'];
                     $model->nominal_denda_dibayar = $denda;
@@ -212,8 +211,10 @@ class PencicilanController extends Controller
                                         }
                                     }
 
-                                    $date=date($model->tanggal_waktu_cicilan.' H:i:s');
-                                    $next_pencicilan->tanggal_waktu_cicilan = $date;
+                                    // $date=date($model->tanggal_waktu_cicilan.' H:i:s');
+                                    // $next_pencicilan->tanggal_waktu_cicilan = $date;
+                                    // $next_pencicilan->tanggal_waktu_cicilan = $model->tanggal_waktu_cicilan;
+                                    $model->tanggal_waktu_cicilan = $post['tanggal_cicilan'];
                                     $next_pencicilan->save(false);
                                 }
                                 $next++;
@@ -266,8 +267,10 @@ class PencicilanController extends Controller
                                         }
                                     }
 
-                                    $date=date($model->tanggal_waktu_cicilan.' H:i:s');
-                                    $next_pencicilan->tanggal_waktu_cicilan = $date;
+                                    // $date=date($model->tanggal_waktu_cicilan.' H:i:s');
+                                    // $next_pencicilan->tanggal_waktu_cicilan = $date;
+                                    // $next_pencicilan->tanggal_waktu_cicilan = $model->tanggal_waktu_cicilan;
+                                    $model->tanggal_waktu_cicilan = $post['tanggal_cicilan'];
                                     $next_pencicilan->save(false);
                                 }
                                 $next++;
@@ -275,6 +278,8 @@ class PencicilanController extends Controller
 
                         } else {
                             //perhitungan bagi yang pencicilan pokok masih kurang
+
+                            $model->id_status_bayar = 2;
 
                             if ($nominal_sesuai_durasi < $peminjaman->nominal_pencicilan - $model->nominal_cicilan) {
                                 //bayar uang kurang
@@ -326,8 +331,10 @@ class PencicilanController extends Controller
                                             }
                                         }
 
-                                        $date=date($model->tanggal_waktu_cicilan.' H:i:s');
-                                        $next_pencicilan->tanggal_waktu_cicilan = $date;
+                                        // $date=date($model->tanggal_waktu_cicilan.' H:i:s');
+                                        // $next_pencicilan->tanggal_waktu_cicilan = $date;
+                                        // $next_pencicilan->tanggal_waktu_cicilan = $model->tanggal_waktu_cicilan;
+                                        $model->tanggal_waktu_cicilan = $post['tanggal_cicilan'];
                                         $next_pencicilan->save(false);
                                     }
                                     $next++;
@@ -336,11 +343,22 @@ class PencicilanController extends Controller
                         }
                     }
                     
-                    $date=date($model->tanggal_waktu_cicilan.' H:i:s');
-                    $model->tanggal_waktu_cicilan = $date;
+                    // $date=date($model->tanggal_waktu_cicilan.' H:i:s');
+                    // $model->tanggal_waktu_cicilan = $date;
+                    $model->tanggal_waktu_cicilan = $post['tanggal_cicilan'];
                     $model->id_jenis_pencicilan = $post['cicilan'];
                     $model->id_pengguna = Yii::$app->user->identity->id;
                     $model->save(false);
+
+                    $dataCicilan = Pencicilan::find()->where(['id_peminjaman'=>$peminjaman->id])->andWhere(['id_status_bayar'=>1])->count();
+
+                    if ($dataCicilan == 0) {
+                        //update status lunas
+                        $peminjaman->id_status_peminjaman = 2;
+                        $peminjaman->save(false);
+                        Yii::$app->session->setFlash('success', "Tambah Data Cicilan Nasabah Berhasil");
+                        return $this->redirect(['pencicilan/index']);
+                    }                    
 
                     $transaction->commit();
 

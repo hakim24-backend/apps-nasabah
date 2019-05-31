@@ -6,6 +6,7 @@ use yii\widgets\ActiveForm;
 use kartik\money\MaskMoney;
 use kartik\file\FileInput;
 use kartik\select2\Select2;
+use kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Peminjaman */
@@ -19,6 +20,14 @@ use kartik\select2\Select2;
             <?php $form = ActiveForm::begin(); ?>
 
             <!-- <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?> -->
+
+            <?php echo $form->field($model, 'tanggal_waktu_pembuatan')->widget(DatePicker::classname(), [
+                'options' => ['placeholder' => 'Masukkan tanggal ...','required'=>true],
+                'pluginOptions' => [
+                    'autoclose'=>true,
+                    'format' => 'yyyy-mm-dd'
+                ]
+            ])?>
 
             <?= $form->field($model, 'nama')->widget(Select2::classname(), [
                 'data' => $nama,

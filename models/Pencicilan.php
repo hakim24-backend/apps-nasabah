@@ -128,18 +128,18 @@ class Pencicilan extends \yii\db\ActiveRecord
                 }
                 if(strtotime(date("Y-m-d")) < strtotime($value->tanggal_jatuh_tempo) && $value->id_status_bayar == 1){
                     $periode = $value->periode;
-                    if(strtotime($pencicilan[$key-1]->tanggal_jatuh_tempo) > strtotime(date("Y-m-d"))){
-                        $in_period = 1;
-                        $tertinggal -= $nominal_cicilan;
+                    if($key>0){
+                        if(strtotime($pencicilan[$key-1]->tanggal_jatuh_tempo) > strtotime(date("Y-m-d"))){
+                            $in_period = 1;
+                            $tertinggal -= $nominal_cicilan;
+                        }
                     }
                     break;
                 }
             }
 
             $intervalDurasi = $durasi - $periode + $in_period;
-            
             $sisaCicilan = ($nominal_peminjaman / $durasi) * $intervalDurasi;
-
             return $tertinggal+($sisaCicilan)+($besar_pinalti_langsung_lunas/100*$sisaCicilan);
 
         } else {

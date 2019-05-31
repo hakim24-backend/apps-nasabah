@@ -78,13 +78,23 @@ function to_rp($val)
     <div class="box box-info">
         <div class="box-body">
 
-            <?php echo $form->field($model, 'tanggal_waktu_cicilan')->widget(DatePicker::classname(), [
+            <!-- <?php echo $form->field($model, 'tanggal_waktu_cicilan')->widget(DatePicker::classname(), [
                 'options' => ['placeholder' => 'Masukkan tanggal ...','required'=>true],
                 'pluginOptions' => [
                     'autoclose'=>true,
                     'format' => 'yyyy-mm-dd'
                 ]
-            ])?>
+            ])?> -->
+
+            <label>Terbayar Pada</label>
+            <?php echo DatePicker::widget([
+                'name' => 'tanggal_cicilan',
+                'value' => date('Y-m-d'),
+                'pluginOptions' => [
+                    'autoclose'=>true,
+                    'format' => 'yyyy-mm-dd'
+                ]
+            ])?><br>
 
             <label>Jenis Cicilan</label>
             <?= Html::dropDownlist('cicilan',0,[1=>'Sesuai Durasi',2=>'Langsung Lunas'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>

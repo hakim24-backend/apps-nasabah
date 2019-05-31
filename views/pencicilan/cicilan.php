@@ -78,6 +78,12 @@ function to_rp($val)
                     }
                     ],
                     [
+                    'attribute' => 'nominal_denda_berhenti',
+                    'value' => function($model){
+                        return to_rp($model->nominal_denda_berhenti);
+                    }
+                    ],
+                    [
                     'attribute' => 'tanggal_waktu_cicilan',
                     'filter' => DatePicker::widget([
                                         'model' => $searchModel, 
@@ -93,7 +99,7 @@ function to_rp($val)
                             return 'Belum ada';
                         } else {
                             $date=date_create($model->tanggal_waktu_cicilan);
-                            return date_format($date, 'd F Y H:i:s');
+                            return date_format($date, 'd F Y');
                         }
                     }
                     ],

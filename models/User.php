@@ -113,7 +113,9 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function validatePassword($password, $username)
     {
         $pengguna = Pengguna::find()->where(['email'=>$username])->one();
+        // var_dump($pengguna);die();
         $akun = Akun::find()->where(['id'=>$pengguna->id_akun])->one();
+        
         return Yii::$app->security->validatePassword($password, $akun->password_hash);
     }
 

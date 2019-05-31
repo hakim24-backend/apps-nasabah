@@ -8,7 +8,7 @@
                 <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle" alt="User Image"/>
             </div>
             <div class="pull-left info">
-                <p><?=Yii::$app->user->identity->nama?></p>
+                <p><!--  --></p>
                 <small>Pinjaman Online</small>
             </div>
         </div>

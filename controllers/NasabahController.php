@@ -290,6 +290,7 @@ class NasabahController extends Controller
     public function actionDelete($id)
     {
         $model = Nasabah::find()->where(['id'=>$id])->one();
+        $nasabah_telpon = NasabahBukuTelepon::find()->where(['id_nasabah'=>$model->id])->all();
         $peminjaman = Peminjaman::find()->where(['id_nasabah'=>$model->id])->one();
 
         if ($peminjaman) {
@@ -307,6 +308,12 @@ class NasabahController extends Controller
 
             Yii::$app->session->setFlash('success', "Hapus Data Nasabah Berhasil");
             return $this->redirect(['index']);
+        }
+
+        if ($nasabah_telpon) {
+            foreach ($nasabah_telpon as $key => $value) {
+                $value->delete();
+            }
         }
     }
 

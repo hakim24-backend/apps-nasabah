@@ -49,13 +49,9 @@ function to_rp($val)
                     }
                     ],
                     [
-                    'attribute' => 'nominal_denda_dibayar',
+                    'attribute' => 'nominal_denda_berhenti',
                     'value' => function($model){
-                        if ($model->nominal_denda_dibayar == null) {
-                            return 'Belum ada';
-                        } else {
-                            return to_rp($model->nominal_denda_dibayar);
-                        }
+                        return to_rp($model->nominal_denda_berhenti);
                     }
                     ],
                     [

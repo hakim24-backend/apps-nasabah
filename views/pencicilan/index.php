@@ -49,7 +49,7 @@ function to_rp($val)
                                     ]),
                         'value'=>function($model){
                             $date=date_create($model->tanggal_waktu_pembuatan);
-                            return date_format($date, 'd F y H:i:s');
+                            return date_format($date, 'd F y');
                         }
                     ],
                     // 'nik_ktp',
