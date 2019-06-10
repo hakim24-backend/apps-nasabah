@@ -89,21 +89,33 @@ class ApiController extends \yii\rest\Controller
                             	$extension = $this->getFileExtension($param['ktp']['name']);
 		                        $name = "ktp-".$nasabah->id."-".time(). '.' . $extension;
 		                        $filedest = 'foto/' . $name;
-		                        move_uploaded_file($param['ktp']['tmp_name'], $filedest);
-		                        $nasabah->foto_ktp = $name;
 
-		                        $extension = $this->getFileExtension($param['with_ktp']['name']);
-		                        $name = "with_ktp-".$nasabah->id."-".time(). '.' . $extension;
-		                        $filedest = 'foto/' . $name;
-		                        move_uploaded_file($param['with_ktp']['tmp_name'], $filedest);
-		                        $nasabah->foto_bersama_ktp = $name;
+                                if(move_uploaded_file($param['ktp']['tmp_name'], $filedest)){
+                                    $nasabah->foto_ktp = $name;
 
-		                        $nasabah->save(false);
+                                    $extension = $this->getFileExtension($param['with_ktp']['name']);
+                                    $name = "with_ktp-".$nasabah->id."-".time(). '.' . $extension;
+                                    $filedest = 'foto/' . $name;
 
-                            	$response['message'] = "Registrasi berhasil";
-		                        $response['status'] = 1;
-		                        $response['customer_id'] = $nasabah->id;
-	                        	$transaction->commit();
+                                    if(move_uploaded_file($param['with_ktp']['tmp_name'], $filedest)){
+                                        $nasabah->foto_bersama_ktp = $name;
+
+                                        $nasabah->save(false);
+
+                                        $response['message'] = "Registrasi berhasil";
+                                        $response['status'] = 1;
+                                        $response['customer_id'] = $nasabah->id;
+                                        $transaction->commit();
+                                    } else {
+                                        $transaction->rollBack();
+                                        $response['message'] = "Gagal mengirim foto dengan ktp";
+                                        $response['status'] = 0;
+                                    }
+                                } else {
+                                    $transaction->rollBack();
+                                    $response['message'] = "Gagal mengirim foto ktp";
+                                    $response['status'] = 0;
+                                }
 	                    	} else {
 	                    		$transaction->rollBack();
 			                    $response['message'] = "Gagal mengirim email konfirmasi";
