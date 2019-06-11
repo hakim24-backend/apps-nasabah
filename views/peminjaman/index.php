@@ -78,20 +78,20 @@ function to_rp($val)
                         }
                     }
                     ],
-                    [
-                        'attribute' => 'foto_ktp',
-                        'format' => 'html',
-                        'value'=>function($data){
-                            return Html::img('../../web/foto/'.$data['foto_ktp'],['width' => '150px']);
-                        }
-                    ],
-                    [
-                        'attribute' => 'foto_bersama_ktp',
-                        'format' => 'html',
-                        'value'=>function($data){
-                            return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
-                        }
-                    ],
+                    // [
+                    //     'attribute' => 'foto_ktp',
+                    //     'format' => 'html',
+                    //     'value'=>function($data){
+                    //         return Html::img('../../web/foto/'.$data['foto_ktp'],['width' => '150px']);
+                    //     }
+                    // ],
+                    // [
+                    //     'attribute' => 'foto_bersama_ktp',
+                    //     'format' => 'html',
+                    //     'value'=>function($data){
+                    //         return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
+                    //     }
+                    // ],
                     //'id_status_peminjaman',
                     //'id_pengguna',
 

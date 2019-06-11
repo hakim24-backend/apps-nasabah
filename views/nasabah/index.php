@@ -51,20 +51,20 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                     ],
                     // 'email:email',
-                    [
-                        'attribute' => 'foto_ktp',
-                        'format' => 'html',
-                        'value'=>function($data){
-                            return Html::img('../../web/foto/'.$data['foto_ktp'],['width' => '150px']);
-                        }
-                    ],
-                    [
-                        'attribute' => 'foto_bersama_ktp',
-                        'format' => 'html',
-                        'value'=>function($data){
-                            return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
-                        }
-                    ],
+                    // [
+                    //     'attribute' => 'foto_ktp',
+                    //     'format' => 'html',
+                    //     'value'=>function($data){
+                    //         return Html::img('../../web/foto/'.$data['foto_ktp'],['width' => '150px']);
+                    //     }
+                    // ],
+                    // [
+                    //     'attribute' => 'foto_bersama_ktp',
+                    //     'format' => 'html',
+                    //     'value'=>function($data){
+                    //         return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
+                    //     }
+                    // ],
                     //'latitude',
                     //'longitude',
                     //'access_token',

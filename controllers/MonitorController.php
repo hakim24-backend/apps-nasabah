@@ -40,10 +40,12 @@ class MonitorController extends Controller
         $searchModel = new NasabahSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->query->joinWith(['peminjamen'])->andWhere(['id_status_peminjaman'=>1]);
+        $dataNasabah = Nasabah::find()->joinWith(['peminjamen'])->andWhere(['id_status_peminjaman'=>1])->count();
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'dataNasabah' => $dataNasabah
         ]);
     }
 

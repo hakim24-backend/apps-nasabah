@@ -9,7 +9,11 @@ use app\models\Peminjaman;
 /* @var $searchModel app\models\NasabahSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Monitoring Nasabah';
+if ($dataNasabah == 0) {
+    $this->title = 'Monitoring Nasabah (Tidak Ada Nasabah Dalam Tanggungan)';
+} else {
+    $this->title = 'Monitoring Nasabah';
+}
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="nasabah-index">
@@ -34,20 +38,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     // 'tanggal_lahir',
                     // 'jenis_kelamin',
                     // 'email:email',
-                    [
-                        'attribute' => 'foto_ktp',
-                        'format' => 'html',
-                        'value'=>function($data){
-                            return Html::img('../../web/foto/'.$data['foto_ktp'],['width' => '150px']);
-                        }
-                    ],
-                    [
-                        'attribute' => 'foto_bersama_ktp',
-                        'format' => 'html',
-                        'value'=>function($data){
-                            return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
-                        }
-                    ],
+                    // [
+                    //     'attribute' => 'foto_ktp',
+                    //     'format' => 'html',
+                    //     'value'=>function($data){
+                    //         return Html::img('../../web/foto/'.$data['foto_ktp'],['width' => '150px']);
+                    //     }
+                    // ],
+                    // [
+                    //     'attribute' => 'foto_bersama_ktp',
+                    //     'format' => 'html',
+                    //     'value'=>function($data){
+                    //         return Html::img('../../web/foto/'.$data['foto_bersama_ktp'],['width' => '150px']);
+                    //     }
+                    // ],
                     [
                         'format' => 'raw',
                         'value'=>function($model){
