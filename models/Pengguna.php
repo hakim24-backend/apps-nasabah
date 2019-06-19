@@ -59,7 +59,7 @@ class Pengguna extends \yii\db\ActiveRecord
             'tempat_lahir' => 'Tempat Lahir',
             'tanggal_lahir' => 'Tanggal Lahir',
             'email' => 'Email',
-            'id_akun' => 'Id Akun',
+            'id_akun' => 'Role',
         ];
     }
 

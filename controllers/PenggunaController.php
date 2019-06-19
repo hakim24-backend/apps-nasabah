@@ -39,6 +39,13 @@ class PenggunaController extends Controller
         $searchModel = new PenggunaSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $pengguna = Pengguna::find()->where(['id'=>Yii::$app->user->identity->id])->one();
+        $akun = Akun::find()->where(['id'=>$pengguna->id_akun])->one();
+
+        if ($akun->id_jenis_akun == 1) {
+            $dataProvider->query->joinWith(['akun'])->andWhere(['id_jenis_akun'=>1]);
+        }
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -80,7 +87,7 @@ class PenggunaController extends Controller
                 $akun->access_token = Yii::$app->getSecurity()->generateRandomString();
                 $akun->tanggal_waktu_pembuatan = date('Y-m-d H:i:s');
                 $akun->id_status_akun = 1;
-                $akun->id_jenis_akun = 2;
+                $akun->id_jenis_akun = 1;
                 $saveAkun = $akun->save(false);
 
                 if ($saveAkun) {

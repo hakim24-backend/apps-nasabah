@@ -36,6 +36,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     //'id_akun',
 
                     [
+                        'attribute' => 'id_akun',
+                        'format' => 'raw',
+                        'value'=>function($model){
+                            if ($model->akun->id_jenis_akun == 1) {
+                                return '<span class="label label-success">Admin</span>';
+                            } elseif($model->akun->id_jenis_akun == 3) {
+                                return '<span class="label label-warning">Owner</span>';
+                            } elseif ($model->akun->id_jenis_akun == 4) {
+                                return '<span class="label label-danger">Developer</span>';
+                            }
+                        }
+                    ],
+
+                    [
                         'class' => 'yii\grid\ActionColumn',
                         'template' => '{view} {update} {delete}',
                         'buttons' => [

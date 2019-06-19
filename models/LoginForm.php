@@ -44,12 +44,43 @@ class LoginForm extends Model
      */
     public function validatePassword($attribute, $params)
     {
-        if (!$this->hasErrors()) {
-            $user = $this->getUser();
+        $user = $this->getUser();
+        $pengguna = Pengguna::find()->where(['email'=>$this->username])->one();
+        // var_dump($pengguna);die();
+        $akun = Akun::find()->where(['id'=>$pengguna->id_akun])->one();
+        // var_dump($akun->id_jenis_akun);die();
 
-            if (!$user || !$user->validatePassword($this->password, $this->username)) {
-                $this->addError($attribute, 'Incorrect username or password.');
+
+        $start = strtotime('09:00');
+        $end = strtotime('18:00');
+
+        if($akun->id_jenis_akun == 3 || $akun->id_jenis_akun == 4) {
+            // var_dump('hai');die();
+            if (!$this->hasErrors()) {
+                $user = $this->getUser();
+
+                if (!$user || !$user->validatePassword($this->password, $this->username)) {
+                    $this->addError($attribute, 'Periksa kembali email atau password');
+                }
             }
+        } elseif (time() >= $start && time() <= $end ) {
+            if (!$this->hasErrors()) {
+                $user = $this->getUser();
+
+                if (!$user || !$user->validatePassword($this->password, $this->username)) {
+                    $this->addError($attribute, 'Periksa kembali email atau password');
+                }
+            }
+        } else {
+            if (!$this->hasErrors()) {
+                $user = $this->getUser();
+
+                if (!$user || !$user->validatePassword($this->password, $this->username)) {
+                    $this->addError($attribute, 'Periksa kembali email atau password');
+                }
+            }
+
+            $this->addError($attribute, 'Jam bekerja belum dimulai atau sudah berakhir');
         }
     }
 
@@ -59,7 +90,7 @@ class LoginForm extends Model
      */
     public function login()
     {
-        if ($this->validate()) {
+        if ($this->validate()) { 
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
         }
         return false;

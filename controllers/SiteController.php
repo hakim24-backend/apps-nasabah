@@ -25,7 +25,7 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error','confirm'],
+                        'actions' => ['login', 'error','confirm','reset-password'],
                         'allow' => true,
                     ],
                     [
@@ -77,6 +77,8 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
+        date_default_timezone_set("Asia/Jakarta");
+
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
@@ -88,6 +90,16 @@ class SiteController extends Controller
 
         $model->password = '';
 
+        // $start = strtotime('09:00');
+        // $end = strtotime('18:00');
+
+        // if(time() >= $start && time() <= $end) {
+
+        // } else {
+        //     Yii::$app->session->setFlash('danger', "Jam Kerja Sudah Berakhir, Tidak Dapat Mengakses");
+        //     return $this->redirect('index');
+        // }
+        
         return $this->render('login', [
             'model' => $model,
         ]);
@@ -153,5 +165,34 @@ class SiteController extends Controller
             ]);
         }
 
+    }
+
+    public function actionResetPassword($id)
+    {
+        $pengguna = Pengguna::find()->where(['id'=>$id])->one();
+        $model = Akun::find()->where(['id'=>$pengguna->id_akun])->one();
+
+        if ($model->load(Yii::$app->request->post())){
+            if($model['currentPassword'] == NULL || $model['currentPassword'] == ""){
+                \Yii::$app->getSession()->setFlash('danger', 'Kolom password kosong !');
+                return $this->redirect(Yii::$app->request->referrer);
+            }else{
+                if (Yii::$app->getSecurity()->validatePassword($model['currentPassword'], $model['password_hash'])) {
+                    // jika password sama
+                    $model['password_hash'] = Yii::$app->getSecurity()->generatePasswordHash($model['newPassword']);
+                    $model->save(false);
+                    \Yii::$app->getSession()->setFlash('success', 'Password Telah Diganti');
+                    return $this->redirect(Yii::$app->request->referrer);
+                }else{
+                    // Jika berbeda
+                    \Yii::$app->getSession()->setFlash('error', 'Maaf Password yang anda masukan tidak cocok');
+                    return $this->redirect(Yii::$app->request->referrer);
+                }
+            }
+        }else{
+            return $this->renderAjax('reset-password', [
+                'model' => $model,
+            ]);
+        }
     }
 }

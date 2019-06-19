@@ -21,6 +21,8 @@ use Yii;
  */
 class Akun extends \yii\db\ActiveRecord
 {
+    public $newPassword, $currentPassword;
+
     /**
      * {@inheritdoc}
      */
@@ -37,9 +39,9 @@ class Akun extends \yii\db\ActiveRecord
         return [
             [['tanggal_waktu_pembuatan'], 'safe'],
             [['id_status_akun', 'id_jenis_akun'], 'integer'],
-            [['password_hash', 'access_token'], 'string', 'max' => 255],
-            [['id_status_akun'], 'exist', 'skipOnError' => true, 'targetClass' => AkunStatus::className(), 'targetAttribute' => ['id_status_akun' => 'id']],
-            [['id_jenis_akun'], 'exist', 'skipOnError' => true, 'targetClass' => AkunJenis::className(), 'targetAttribute' => ['id_jenis_akun' => 'id']],
+            [['password_hash', 'access_token','newPassword', 'currentPassword'], 'string', 'max' => 255],
+            [['id_status_akun'], 'exist', 'skipOnError' => true, 'targetClass' => Akun::className(), 'targetAttribute' => ['id_status_akun' => 'id']],
+            [['id_jenis_akun'], 'exist', 'skipOnError' => true, 'targetClass' => Akun::className(), 'targetAttribute' => ['id_jenis_akun' => 'id']],
         ];
     }
 

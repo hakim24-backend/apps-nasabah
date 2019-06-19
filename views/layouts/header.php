@@ -1,5 +1,7 @@
 <?php
 use yii\helpers\Html;
+use yii\helpers\Url;
+use yii\bootstrap\Modal;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -39,6 +41,12 @@ use yii\helpers\Html;
                         </li>
                         <!-- Menu Footer-->
                         <li class="user-footer">
+                            <div class="pull-left">
+                                <?php 
+                                    $url = Url::toRoute(['/site/reset-password', 'id'=>Yii::$app->user->identity->id]);
+                                    echo Html::button('Ubah Password', ['value'=>$url,'class' => 'btn btn-default modalButton']);
+                                ?>
+                            </div>
                             <div class="pull-right">
                                 <?= Html::a(
                                     'Sign out',
@@ -53,3 +61,22 @@ use yii\helpers\Html;
         </div>
     </nav>
 </header>
+
+<?php
+
+    Modal::begin([
+        'header' => 'Ubah Password',
+        'id' => 'modal',
+        'size' => 'modal-md',
+    ]);
+    echo "<div id='modalContent'></div>";
+    Modal::end();
+
+    $this->registerJs("
+        $('.modalButton').on('click', function () {
+            $('#modal').modal('show')
+            .find('#modalContent')
+            .load($(this).attr('value'));
+        });
+    ");
+?>
