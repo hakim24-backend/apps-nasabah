@@ -16,6 +16,7 @@ use yii\web\Uploadedfile;
 use yii\helpers\ArrayHelper;
 use kartik\file\FileInput;
 use yii\helpers\Html;
+use yii\filters\AccessControl;
 
 /**
  * PeminjamanController implements the CRUD actions for Peminjaman model.
@@ -28,6 +29,20 @@ class PeminjamanController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['login', 'error'],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['index', 'view', 'create', 'get-status', 'get-status-update', 'get-durasi','get-nasabah', 'update', 'delete', 'findModel'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
