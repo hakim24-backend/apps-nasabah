@@ -115,13 +115,12 @@ class Pencicilan extends \yii\db\ActiveRecord
             $periode = 0;
             $tertinggal = 0;
             foreach ($pencicilan as $key => $value) {
+                if($value->id_status_bayar == 1){
+                    $tertinggal += $nominal_cicilan;
+                }
                 if(strtotime(date("Y-m-d")) < strtotime($value->tanggal_jatuh_tempo)){
                     $periode = $value->periode;
                     break;
-                } else {
-                    if($value->id_status_bayar == 1){
-                        $tertinggal += $nominal_cicilan;
-                    }
                 }
             }
 
