@@ -41,7 +41,7 @@ class PencicilanController extends Controller
     {
         $searchModel = new PeminjamanSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->query;
+        $dataProvider->query->orderBy(['tanggal_waktu_pembuatan' => SORT_DESC]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -114,6 +114,8 @@ class PencicilanController extends Controller
         //lunas dipercepat jaminan
         $rumus = Pencicilan::getLunasDipercepat($peminjaman->id_jenis_peminjaman, $totalCicilan, $peminjaman->durasi, $peminjaman->nominal_peminjaman, $jenisPeminjaman->besar_pinalti_langsung_lunas, $peminjaman->nominal_pencicilan, $peminjaman->id, $peminjaman->nominal_tabungan_ditahan);
 
+        // var_dump($rumus);die;
+
         if($model->nominal_denda_berhenti != null){
             $denda = $model->nominal_denda_berhenti;
         } else {
@@ -140,6 +142,8 @@ class PencicilanController extends Controller
                         $value->save(false);
                     }
 
+                    $date=date($model->tanggal_waktu_cicilan.' H:i:s');
+                    $model->tanggal_waktu_cicilan = $date;
                     $model->nominal_cicilan = $nominal_lunas;
                     $model->id_jenis_pencicilan = $post['cicilan'];
                     $model->nominal_denda_dibayar = $denda;
@@ -208,6 +212,8 @@ class PencicilanController extends Controller
                                         }
                                     }
 
+                                    $date=date($model->tanggal_waktu_cicilan.' H:i:s');
+                                    $next_pencicilan->tanggal_waktu_cicilan = $date;
                                     $next_pencicilan->save(false);
                                 }
                                 $next++;
@@ -260,6 +266,8 @@ class PencicilanController extends Controller
                                         }
                                     }
 
+                                    $date=date($model->tanggal_waktu_cicilan.' H:i:s');
+                                    $next_pencicilan->tanggal_waktu_cicilan = $date;
                                     $next_pencicilan->save(false);
                                 }
                                 $next++;
@@ -318,6 +326,8 @@ class PencicilanController extends Controller
                                             }
                                         }
 
+                                        $date=date($model->tanggal_waktu_cicilan.' H:i:s');
+                                        $next_pencicilan->tanggal_waktu_cicilan = $date;
                                         $next_pencicilan->save(false);
                                     }
                                     $next++;
@@ -326,6 +336,8 @@ class PencicilanController extends Controller
                         }
                     }
                     
+                    $date=date($model->tanggal_waktu_cicilan.' H:i:s');
+                    $model->tanggal_waktu_cicilan = $date;
                     $model->id_jenis_pencicilan = $post['cicilan'];
                     $model->id_pengguna = Yii::$app->user->identity->id;
                     $model->save(false);

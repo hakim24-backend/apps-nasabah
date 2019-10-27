@@ -93,7 +93,7 @@ function to_rp($val)
                             return 'Belum ada';
                         } else {
                             $date=date_create($model->tanggal_waktu_cicilan);
-                            return date_format($date, 'd F Y');
+                            return date_format($date, 'd F Y H:i:s');
                         }
                     }
                     ],
