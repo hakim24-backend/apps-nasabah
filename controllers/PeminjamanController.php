@@ -92,9 +92,15 @@ class PeminjamanController extends Controller
         $model = new Peminjaman();
 
         //join nasabah with akun
+        // $data = Nasabah::find()
+        // ->leftJoin('Akun', 'Akun.id = Nasabah.id_akun')
+        // ->where(['Akun.id_status_akun'=>1])
+        // ->asArray()
+        // ->all();
+
         $data = Nasabah::find()
-        ->leftJoin('Akun', 'Akun.id = Nasabah.id_akun')
-        ->where(['Akun.id_status_akun'=>1])
+        ->joinWith('akun')
+        ->where(['id_status_akun'=>1])
         ->asArray()
         ->all();
 
@@ -145,7 +151,7 @@ class PeminjamanController extends Controller
 
                     $model->nominal_admin = $adminNominal;
                     $model->nominal_tabungan_ditahan = $tabunganDitahan;
-                    $model->nominal_pencicilan = $cicilan;
+                    $model->nominal_pencicilan = round($cicilan);
                 } else {
                     $model->jaminan = $post['jaminan'];
                     $jenisPeminjaman = PeminjamanJenis::find()->where(['id'=>$model->id_jenis_peminjaman])->one();
@@ -157,11 +163,16 @@ class PeminjamanController extends Controller
                     $tabunganDitahan = $model->nominal_peminjaman*$jenisPeminjaman->besar_tabungan_ditahan/100;
 
                     //nominal pencicilan
-                    $cicilan = (($model->nominal_peminjaman*$model->durasi*$jenisPeminjaman->besar_bunga/100)+($model->nominal_peminjaman))/$model->durasi;
+
+                    if ($post['status'] == 2 && $post['jenis-durasi'] == 1) {
+                        $cicilan = (($model->nominal_peminjaman*$model->durasi*3/100)+($model->nominal_peminjaman))/$model->durasi;
+                    } else {
+                        $cicilan = (($model->nominal_peminjaman*$model->durasi*$jenisPeminjaman->besar_bunga/100)+($model->nominal_peminjaman))/$model->durasi;
+                    }
 
                     $model->nominal_admin = $adminNominal;
                     $model->nominal_tabungan_ditahan = $tabunganDitahan;
-                    $model->nominal_pencicilan = $cicilan;
+                    $model->nominal_pencicilan = round($cicilan);
                 }
 
                 $model->alamat = $post['alamat'];

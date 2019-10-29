@@ -37,7 +37,7 @@ function to_rp($val)
                     // 'id',
                     // 'id_nasabah',
                     // 'id_jenis_peminjaman',
-                    // 'nomor_kontrak',
+                    'nomor_kontrak',
                     [
                         'attribute' => 'tanggal_waktu_pembuatan',
                         'filter' => DatePicker::widget([
@@ -51,7 +51,7 @@ function to_rp($val)
                                     ]),
                         'value'=>function($model){
                             $date=date_create($model->tanggal_waktu_pembuatan);
-                            return date_format($date, 'd F y');
+                            return date_format($date, 'd F Y');
                         }
                     ],
                     // 'nik_ktp',

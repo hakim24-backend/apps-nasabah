@@ -13,7 +13,7 @@ use app\models\NasabahSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\Uploadedfile;
+use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 
@@ -316,19 +316,23 @@ class NasabahController extends Controller
             {
                 unlink('foto/'.$model->foto_ktp);
                 unlink('foto/'.$model->foto_bersama_ktp);
+                if ($nasabah_telpon) {
+                    foreach ($nasabah_telpon as $key => $value) {
+                        $value->delete();
+                    }
+                }
                 $model->delete();
             } else {
+                if ($nasabah_telpon) {
+                    foreach ($nasabah_telpon as $key => $value) {
+                        $value->delete();
+                    }
+                }
                 $model->delete();
             }
 
             Yii::$app->session->setFlash('success', "Hapus Data Nasabah Berhasil");
             return $this->redirect(['index']);
-        }
-
-        if ($nasabah_telpon) {
-            foreach ($nasabah_telpon as $key => $value) {
-                $value->delete();
-            }
         }
     }
 

@@ -36,6 +36,7 @@ function to_rp($val)
                     // 'id',
                     // 'id_nasabah',
                     // 'id_jenis_peminjaman',
+                    'nomor_kontrak',
                     [
                         'attribute' => 'tanggal_waktu_pembuatan',
                         'filter' => DatePicker::widget([

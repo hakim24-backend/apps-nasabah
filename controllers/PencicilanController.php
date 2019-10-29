@@ -371,6 +371,9 @@ class PencicilanController extends Controller
                         //update status lunas
                         $peminjaman->id_status_peminjaman = 2;
                         $peminjaman->save(false);
+
+                        $transaction->commit();
+
                         Yii::$app->session->setFlash('success', "Tambah Data Cicilan Nasabah Berhasil");
                         return $this->redirect(['pencicilan/index']);
                     }                    

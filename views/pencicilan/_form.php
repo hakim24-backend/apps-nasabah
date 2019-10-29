@@ -96,10 +96,16 @@ function to_rp($val)
                 ]
             ])?><br>
 
-            <label>Jenis Cicilan</label>
-            <?= Html::dropDownlist('cicilan',0,[1=>'Sesuai Durasi',2=>'Langsung Lunas'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>
-            <br>
-
+            <?php if ($info->durasi - intval($totalCicilan) == 1) { ?>
+                <label>Jenis Cicilan</label>
+                <?= Html::dropDownlist('cicilan',0,[1=>'Sesuai Durasi'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>
+                <br>
+            <?php } else { ?>
+                <label>Jenis Cicilan</label>
+                <?= Html::dropDownlist('cicilan',0,[1=>'Sesuai Durasi',2=>'Langsung Lunas'], ['prompt' => 'Pilih Status Peminjaman...', 'required' => true, 'class' => 'form-control', 'id' => 'cicilan', 'style' => 'width: 100%']) ?>
+                <br>
+            <?php } ?>
+            
             <div id="money">
                 <label>Nominal Cicilan</label>
                 <?php echo MaskMoney::widget([

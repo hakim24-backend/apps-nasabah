@@ -2,6 +2,12 @@
 
 return [
 
+    // 'class' => 'yii\db\Connection',
+    // 'dsn' => 'mysql:host=localhost;dbname=pinjaman_online_live',
+    // 'username' => 'root',
+    // 'password' => '',
+    // 'charset' => 'utf8',
+
     'class' => 'yii\db\Connection',
     'dsn' => 'mysql:host=localhost;dbname=pinjaman_online',
     'username' => 'root',

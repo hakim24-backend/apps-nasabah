@@ -60,6 +60,11 @@ class Akun extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function findIdentity($id)
+    {
+        return static::findOne(['id' => $id]);
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

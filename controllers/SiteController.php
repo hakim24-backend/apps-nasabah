@@ -25,7 +25,7 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error','confirm'],
+                        'actions' => ['login', 'error','confirm','privacy'],
                         'allow' => true,
                     ],
                     [
@@ -78,6 +78,13 @@ class SiteController extends Controller
     public function actionLogin()
     {
         date_default_timezone_set("Asia/Jakarta");
+        $start = strtotime('09:00');
+        $end = strtotime('18:00');
+
+        $time = time();
+        $jam = date('H:i:s', $time);
+
+        // var_dump($jam);die();
 
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
@@ -194,5 +201,11 @@ class SiteController extends Controller
                 'model' => $model,
             ]);
         }
+    }
+
+    public function actionPrivacy()
+    {
+        $this->layout = 'main-login.php';
+        return $this->render('privacy');
     }
 }

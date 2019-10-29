@@ -46,41 +46,42 @@ class LoginForm extends Model
     {
         $user = $this->getUser();
         $pengguna = Pengguna::find()->where(['email'=>$this->username])->one();
-        // var_dump($pengguna);die();
-        $akun = Akun::find()->where(['id'=>$pengguna->id_akun])->one();
-        // var_dump($akun->id_jenis_akun);die();
 
-
-        $start = strtotime('09:00');
-        $end = strtotime('18:00');
-
-        if($akun->id_jenis_akun == 3 || $akun->id_jenis_akun == 4) {
-            // var_dump('hai');die();
-            if (!$this->hasErrors()) {
-                $user = $this->getUser();
-
-                if (!$user || !$user->validatePassword($this->password, $this->username)) {
-                    $this->addError($attribute, 'Periksa kembali email atau password');
-                }
-            }
-        } elseif (time() >= $start && time() <= $end ) {
-            if (!$this->hasErrors()) {
-                $user = $this->getUser();
-
-                if (!$user || !$user->validatePassword($this->password, $this->username)) {
-                    $this->addError($attribute, 'Periksa kembali email atau password');
-                }
-            }
+        if ($pengguna == null) {
+            $this->addError($attribute, 'Akun Tidak Ditemukan');
         } else {
-            if (!$this->hasErrors()) {
-                $user = $this->getUser();
+            $akun = Akun::find()->where(['id'=>$pengguna->id_akun])->one();
+            $start = strtotime('09:00');
+            $end = strtotime('18:00');
 
-                if (!$user || !$user->validatePassword($this->password, $this->username)) {
-                    $this->addError($attribute, 'Periksa kembali email atau password');
+            if($akun->id_jenis_akun == 3 || $akun->id_jenis_akun == 4) {
+                // var_dump('hai');die();
+                if (!$this->hasErrors()) {
+                    $user = $this->getUser();
+
+                    if (!$user || !$user->validatePassword($this->password, $this->username)) {
+                        $this->addError($attribute, 'Periksa kembali email atau password');
+                    }
                 }
-            }
+            } elseif (time() >= $start && time() <= $end ) {
+                if (!$this->hasErrors()) {
+                    $user = $this->getUser();
 
-            $this->addError($attribute, 'Jam bekerja belum dimulai atau sudah berakhir');
+                    if (!$user || !$user->validatePassword($this->password, $this->username)) {
+                        $this->addError($attribute, 'Periksa kembali email atau password');
+                    }
+                }
+            } else {
+                if (!$this->hasErrors()) {
+                    $user = $this->getUser();
+
+                    if (!$user || !$user->validatePassword($this->password, $this->username)) {
+                        $this->addError($attribute, 'Periksa kembali email atau password');
+                    }
+                }
+
+                $this->addError($attribute, 'Jam bekerja belum dimulai atau sudah berakhir');
+            }
         }
     }
 
