@@ -173,8 +173,8 @@ class PencicilanController extends Controller
                     $nominal_sesuai_durasi = str_ireplace('Rp ', '', $nominal_sesuai_durasi);
 
                     if($model->nominal_cicilan == null){
-                        //saat belum ada pembayaran pada suatu pencicilan
 
+                        //saat belum ada pembayaran pada suatu pencicilan
                         if ($nominal_sesuai_durasi < $peminjaman->nominal_pencicilan) {
                             //bayar uang kurang
                             $model->nominal_cicilan = $nominal_sesuai_durasi;
@@ -196,8 +196,13 @@ class PencicilanController extends Controller
                                 $sisa -= $denda;
                             }
 
+                            // var_dump('masuk sini');die();
+
                             $next = 1;
                             while ($sisa > 0){
+
+                                var_dump('masuk while');die();
+
                                 $next_pencicilan = Pencicilan::find()->where(['periode'=>(($model->periode)+$next)])->andWhere(['id_peminjaman'=>$model->id_peminjaman])->one();
 
                                 $next_denda = Peminjaman::getDenda($next_pencicilan->tanggal_jatuh_tempo, $peminjaman->nominal_pencicilan, $jenisPeminjaman->besar_denda);
@@ -237,8 +242,8 @@ class PencicilanController extends Controller
                         }
                     } else {
                         if ($model->nominal_cicilan == $peminjaman->nominal_pencicilan) {
-                            //perhitungan bagi yang hanya sisa denda saja
 
+                            //perhitungan bagi yang hanya sisa denda saja
                             $sisa = $nominal_sesuai_durasi;
 
                             if (($model->nominal_denda_berhenti - $model->nominal_denda_dibayar) > $sisa) {
